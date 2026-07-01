@@ -10,10 +10,11 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("ecf26358-9b2d-44f1-996a-3d7f81044366")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("ThaoQuyenEditor.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cf55ac58ac126a25421edf87ec8bacb88b440aa1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bb6e645167945bbbd7f64d5214e9ed0ed2a32024")]
 [assembly: System.Reflection.AssemblyProductAttribute("ThaoQuyenEditor.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ThaoQuyenEditor.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

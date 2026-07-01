@@ -2,7 +2,6 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Npgsql;
 using ThaoQuyenEditor.Api.Data;
 using ThaoQuyenEditor.Api.Services;
 
@@ -11,10 +10,6 @@ var builder = WebApplication.CreateBuilder(args);
 // ── Database (PostgreSQL via Supabase) ────────────────────
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Missing ConnectionStrings:DefaultConnection");
-
-var envDbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-if (!string.IsNullOrEmpty(envDbUrl))
-    connectionString = BuildConnectionString(envDbUrl);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
@@ -104,31 +99,3 @@ app.MapGet("/api/health", () => Results.Ok(new
 })).AllowAnonymous();
 
 app.Run();
-
-static string BuildConnectionString(string value)
-{
-    if (!Uri.TryCreate(value, UriKind.Absolute, out var uri) ||
-        (uri.Scheme != "postgres" && uri.Scheme != "postgresql"))
-    {
-        return value;
-    }
-
-    var userInfo = uri.UserInfo.Split(':', 2);
-    var builder = new NpgsqlConnectionStringBuilder
-    {
-        Host = uri.Host,
-        Port = uri.Port > 0 ? uri.Port : 5432,
-        Database = uri.AbsolutePath.Trim('/'),
-        Username = Uri.UnescapeDataString(userInfo[0]),
-        SslMode = SslMode.Require
-    };
-
-    if (userInfo.Length > 1)
-        builder.Password = Uri.UnescapeDataString(userInfo[1]);
-
-    var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
-    if (!string.IsNullOrWhiteSpace(query["sslmode"]) && Enum.TryParse<SslMode>(query["sslmode"], true, out var sslMode))
-        builder.SslMode = sslMode;
-
-    return builder.ConnectionString;
-}

@@ -6,7 +6,7 @@ services:
     dockerfilePath: Dockerfile
     healthCheckPath: /api/health
     envVars:
-      - key: DATABASE_URL
+      - key: ConnectionStrings__DefaultConnection
         sync: false
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
