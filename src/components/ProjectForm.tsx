@@ -1,0 +1,301 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useMockDb } from '@/context/MockDbContext';
+import { Project } from '@/lib/mockDb';
+import { generateSlug } from '@/lib/slugify';
+import { IconChevronLeft, IconVideo } from '@tabler/icons-react';
+
+interface ProjectFormProps {
+  project?: Project; // If editing
+}
+
+export default function ProjectForm({ project }: ProjectFormProps) {
+  const router = useRouter();
+  const { categories, addProject, updateProject } = useMockDb();
+
+  const [title, setTitle] = useState(project?.title || '');
+  const [slug, setSlug] = useState(project?.slug || '');
+  const [shortDescription, setShortDescription] = useState(project?.short_description || '');
+  const [description, setDescription] = useState(project?.description || '');
+  const [thumbnailUrl, setThumbnailUrl] = useState(project?.thumbnail_url || '');
+  const [videoUrl, setVideoUrl] = useState(project?.video_url || '');
+  const [categoryId, setCategoryId] = useState(project?.category_id || categories[0]?.id || '');
+  const [clientName, setClientName] = useState(project?.client_name || '');
+  const [toolsInput, setToolsInput] = useState(project?.tools_used?.join(', ') || '');
+  const [projectGoals, setProjectGoals] = useState(project?.project_goals || '');
+  const [editorRole, setEditorRole] = useState(project?.editor_role || '');
+  const [isFeatured, setIsFeatured] = useState(project?.is_featured || false);
+  const [projectDate, setProjectDate] = useState(project?.project_date || new Date().toISOString().split('T')[0]);
+
+  const handleTitleChange = (newTitle: string) => {
+    setTitle(newTitle);
+    setSlug(generateSlug(newTitle));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title || !slug || !categoryId) return;
+
+    // Parse toolsInput from comma separated to array
+    const tools_used = toolsInput
+      .split(',')
+      .map((t) => t.trim())
+      .filter((t) => t !== '');
+
+    const projectData = {
+      title,
+      slug,
+      short_description: shortDescription,
+      description,
+      thumbnail_url: thumbnailUrl,
+      video_url: videoUrl,
+      category_id: categoryId,
+      client_name: clientName,
+      tools_used,
+      project_goals: projectGoals,
+      editor_role: editorRole,
+      is_featured: isFeatured,
+      is_published: true,
+      project_date: projectDate
+    };
+
+    try {
+      if (project) {
+        updateProject(project.id, projectData);
+      } else {
+        addProject(projectData);
+      }
+      router.push('/admin/projects');
+    } catch (err: unknown) {
+      const error = err as Error;
+      alert(error.message || 'Lỗi khi lưu dữ liệu.');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Back Button */}
+      <div className="flex items-center gap-4">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-primary font-semibold"
+        >
+          <IconChevronLeft className="w-4 h-4" />
+          Quay lại danh sách
+        </button>
+      </div>
+
+      <div className="border border-card-border bg-white shadow-sm p-6 rounded-2xl space-y-6">
+        <div className="flex items-center gap-2 border-b border-card-border pb-3">
+          <IconVideo className="w-5 h-5 text-emerald-600" />
+          <h3 className="text-base font-bold text-slate-900">
+            {project ? 'Cập nhật thông tin Project' : 'Khởi tạo Project Mới'}
+          </h3>
+        </div>
+
+        {/* Layout Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Title */}
+          <div className="space-y-1.5 md:col-span-2">
+            <label className="text-xs font-semibold text-slate-600">Tiêu đề Project *</label>
+            <input
+              type="text"
+              required
+              value={title}
+              onChange={(e) => handleTitleChange(e.target.value)}
+              placeholder="Nhập tên dự án video..."
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-primary/50 focus:outline-none focus:bg-white transition-all"
+            />
+          </div>
+
+          {/* Category */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-600">Danh mục phân loại *</label>
+            <select
+              required
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-800 focus:border-primary/50 focus:outline-none cursor-pointer focus:bg-white"
+            >
+              <option value="" disabled>Chọn danh mục</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Client Name */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-600">Tên khách hàng / Nhãn hàng</label>
+            <input
+              type="text"
+              value={clientName}
+              onChange={(e) => setClientName(e.target.value)}
+              placeholder="GlowSkin, FlexWear, etc."
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-primary/50 focus:outline-none focus:bg-white transition-all"
+            />
+          </div>
+
+          {/* Video URL & Direct Upload */}
+          <div className="space-y-1.5 md:col-span-2">
+            <label className="text-xs font-semibold text-slate-600">Video Dự án (Định dạng dọc 9:16 - URL hoặc Tải video lên) *</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                required
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                placeholder="https://www.youtube.com/watch?v=... hoặc dữ liệu file video"
+                className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-primary/50 focus:outline-none focus:bg-white transition-all"
+              />
+              <label className="inline-flex items-center justify-center rounded-xl border border-slate-200 hover:border-primary/50 hover:bg-slate-50 px-4 text-xs font-semibold text-slate-700 cursor-pointer transition-colors">
+                Tải video lên
+                <input
+                  type="file"
+                  accept="video/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                      if (event.target?.result) {
+                        setVideoUrl(event.target.result as string);
+                        setThumbnailUrl(event.target.result as string);
+                      }
+                    };
+                    reader.readAsDataURL(file);
+                  }}
+                />
+              </label>
+            </div>
+            {videoUrl && (
+              <div className="mt-2 p-3 bg-slate-50 rounded-xl border border-slate-200 max-w-xs">
+                <span className="text-[10px] font-semibold text-slate-400 block mb-1">Xem trước video:</span>
+                {videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be') ? (
+                  <iframe
+                    src={videoUrl.replace('watch?v=', 'embed/')}
+                    className="w-full aspect-[9/16] rounded-lg border border-slate-200"
+                    allowFullScreen
+                  />
+                ) : (
+                  <video src={videoUrl} controls className="w-full aspect-[9/16] rounded-lg border border-slate-200 object-cover" />
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Project Date */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-600">Ngày thực hiện *</label>
+            <input
+              type="date"
+              required
+              value={projectDate}
+              onChange={(e) => setProjectDate(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-800 focus:border-primary/50 focus:outline-none focus:bg-white transition-all cursor-pointer"
+            />
+          </div>
+
+          {/* Tools Used */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-600">Công cụ (các công cụ cách nhau bởi dấu phẩy)</label>
+            <input
+              type="text"
+              value={toolsInput}
+              onChange={(e) => setToolsInput(e.target.value)}
+              placeholder="Premiere Pro, After Effects, CapCut, Audition"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-primary/50 focus:outline-none focus:bg-white transition-all"
+            />
+          </div>
+        </div>
+
+        {/* Roles & Goals */}
+        <div className="grid grid-cols-1 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-600">Vai trò của Thảo Quyên trong dự án</label>
+            <input
+              type="text"
+              value={editorRole}
+              onChange={(e) => setEditorRole(e.target.value)}
+              placeholder="Lead Editor, Colorist, Sound Designer, VFX Editor..."
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-primary/50 focus:outline-none focus:bg-white transition-all"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-600">Mục tiêu của dự án (Goals)</label>
+            <input
+              type="text"
+              value={projectGoals}
+              onChange={(e) => setProjectGoals(e.target.value)}
+              placeholder="Tăng doanh số, xây dựng branding, thu hút 100k view..."
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-primary/50 focus:outline-none focus:bg-white transition-all"
+            />
+          </div>
+        </div>
+
+        {/* Descriptions */}
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-600">Mô tả ngắn (Hiển thị ở trang danh sách) *</label>
+            <input
+              type="text"
+              required
+              value={shortDescription}
+              onChange={(e) => setShortDescription(e.target.value)}
+              placeholder="Nhập mô tả ngắn gọn khoảng 1-2 câu..."
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-primary/50 focus:outline-none focus:bg-white transition-all"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-600">Mô tả đầy đủ chi tiết</label>
+            <textarea
+              rows={5}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Nhập thông tin chi tiết về sản phẩm, quá trình lên ý tưởng, hậu kỳ..."
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-primary/50 focus:outline-none focus:bg-white transition-all resize-none"
+            />
+          </div>
+        </div>
+
+        {/* Options Row */}
+        <div className="flex flex-wrap items-center gap-6 pt-2 border-t border-card-border">
+          <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={isFeatured}
+              onChange={(e) => setIsFeatured(e.target.checked)}
+              className="h-4 w-4 rounded border-slate-350 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+            />
+            Dự án nổi bật (Featured)
+          </label>
+        </div>
+
+        {/* Submit */}
+        <div className="flex justify-end gap-3 pt-4 border-t border-card-border">
+          <button
+            type="button"
+            onClick={() => router.push('/admin/projects')}
+            className="rounded-xl border border-slate-205 border-slate-200 bg-slate-100 px-6 py-2.5 text-xs font-semibold text-slate-800 hover:bg-slate-200 transition-all"
+          >
+            Hủy bỏ
+          </button>
+          <button
+            type="submit"
+            className="rounded-xl bg-primary px-6 py-2.5 text-xs font-semibold text-white hover:bg-emerald-500 transition-all shadow-sm"
+          >
+            Lưu thay đổi
+          </button>
+        </div>
+      </div>
+    </form>
+  );
+}
