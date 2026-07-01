@@ -1,11 +1,10 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-COPY backend/ThaoQuyenEditor.Api.csproj backend/
-WORKDIR /src/backend
+COPY ThaoQuyenEditor.Api.csproj .
 RUN dotnet restore
 
-COPY backend/. .
+COPY . .
 RUN dotnet publish -c Release -o /app
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
