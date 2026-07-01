@@ -25,7 +25,7 @@ export default function ProjectDetailPage({ params }: PageProps) {
   const resolvedParams = use(params);
   const { projects, categories } = useSiteData();
 
-  const project = projects.find((p) => p.slug === resolvedParams.slug && p.is_published);
+  const project = projects.find((p) => p.slug.toLowerCase() === resolvedParams.slug.toLowerCase() && p.is_published);
 
   if (!project) {
     return (
@@ -42,11 +42,11 @@ export default function ProjectDetailPage({ params }: PageProps) {
     );
   }
 
-  const category = categories.find((c) => c.id === project.category_id);
+  const category = categories.find((c) => c.id.toLowerCase() === project.category_id.toLowerCase());
 
   // Get related projects from the same category
   const relatedProjects = projects
-    .filter((p) => p.category_id === project.category_id && p.id !== project.id && p.is_published)
+    .filter((p) => p.category_id.toLowerCase() === project.category_id.toLowerCase() && p.id.toLowerCase() !== project.id.toLowerCase() && p.is_published)
     .slice(0, 3);
 
   return (

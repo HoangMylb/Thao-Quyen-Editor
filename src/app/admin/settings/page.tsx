@@ -35,12 +35,12 @@ export default function AdminSettingsPage() {
 
   const [heroBgType, setHeroBgType] = useState<'color' | 'image' | 'video'>(profile?.hero_bg_type || 'color');
   const [heroBgUrl, setHeroBgUrl] = useState(profile?.hero_bg_url || '');
-  const [heroVideoProjectId, setHeroVideoProjectId] = useState(profile?.hero_video_project_id || '');
+  const [heroVideoProjectId, setHeroVideoProjectId] = useState((profile?.hero_video_project_id || '').toLowerCase());
   const [homepageFeaturedProjectIds, setHomepageFeaturedProjectIds] = useState<string[]>(
-    profile?.homepage_featured_project_ids || []
+    Array.from(new Set((profile?.homepage_featured_project_ids || []).map((id) => id.toLowerCase())))
   );
   const [homepageCategoryIds, setHomepageCategoryIds] = useState<string[]>(
-    profile?.homepage_category_ids || []
+    Array.from(new Set((profile?.homepage_category_ids || []).map((id) => id.toLowerCase())))
   );
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, setUrl: (url: string) => void) => {
@@ -86,9 +86,9 @@ export default function AdminSettingsPage() {
       blogs_title: blogsTitle,
       hero_bg_type: heroBgType,
       hero_bg_url: heroBgUrl,
-      hero_video_project_id: heroVideoProjectId,
-      homepage_featured_project_ids: homepageFeaturedProjectIds,
-      homepage_category_ids: homepageCategoryIds
+      hero_video_project_id: heroVideoProjectId.toLowerCase(),
+      homepage_featured_project_ids: Array.from(new Set(homepageFeaturedProjectIds.filter(Boolean))),
+      homepage_category_ids: Array.from(new Set(homepageCategoryIds))
     };
 
     await updateProfile(newProfile);
@@ -505,8 +505,8 @@ export default function AdminSettingsPage() {
                     <select
                       value={heroVideoProjectId}
                       onChange={(e) => {
-                        setHeroVideoProjectId(e.target.value);
-                        const proj = projects.find(p => p.id === e.target.value);
+                        setHeroVideoProjectId(e.target.value.toLowerCase());
+                        const proj = projects.find(p => p.id.toLowerCase() === e.target.value.toLowerCase());
                         if (proj?.video_url) setHeroBgUrl(proj.video_url);
                       }}
                       className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 focus:border-primary/50 focus:outline-none focus:bg-white transition-all"
@@ -554,8 +554,10 @@ export default function AdminSettingsPage() {
                       value={homepageFeaturedProjectIds[slotIndex] || ''}
                       onChange={(e) => {
                         const updated = [...homepageFeaturedProjectIds];
-                        updated[slotIndex] = e.target.value;
-                        setHomepageFeaturedProjectIds(updated);
+                        updated[slotIndex] = e.target.value.toLowerCase();
+                        setHomepageFeaturedProjectIds(
+                          updated.map((value, index, all) => (value && all.indexOf(value) !== index ? '' : value))
+                        );
                       }}
                       className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 focus:border-primary/50 focus:outline-none focus:bg-white transition-all"
                     >
@@ -574,7 +576,8 @@ export default function AdminSettingsPage() {
               <h4 className="text-xs font-bold text-slate-800 font-sans">Chọn danh mục dịch vụ xuất hiện ở trang chủ</h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {categories.map((cat) => {
-                  const isChecked = homepageCategoryIds.includes(cat.id);
+                  const normalizedId = cat.id.toLowerCase();
+                  const isChecked = homepageCategoryIds.includes(normalizedId);
                   return (
                     <label key={cat.id} className="flex items-center gap-2.5 text-xs font-semibold text-slate-700 cursor-pointer">
                       <input
@@ -582,9 +585,9 @@ export default function AdminSettingsPage() {
                         checked={isChecked}
                         onChange={(e) => {
                           if (e.target.checked) {
-                            setHomepageCategoryIds([...homepageCategoryIds, cat.id]);
+                            setHomepageCategoryIds(Array.from(new Set([...homepageCategoryIds, normalizedId])));
                           } else {
-                            setHomepageCategoryIds(homepageCategoryIds.filter(id => id !== cat.id));
+                            setHomepageCategoryIds(homepageCategoryIds.filter(id => id !== normalizedId));
                           }
                         }}
                         className="h-4 w-4 rounded border-slate-350 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"

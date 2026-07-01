@@ -14,7 +14,7 @@ export default function EditPostPage({ params }: PageProps) {
   const resolvedParams = use(params);
   const { posts } = useSiteData();
   
-  const post = posts.find((p) => p.id === resolvedParams.id);
+  const post = posts.find((p) => p.id.toLowerCase() === resolvedParams.id.toLowerCase());
 
   if (!post) {
     return (

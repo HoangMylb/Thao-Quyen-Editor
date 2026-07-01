@@ -8,7 +8,7 @@ export default function CategoriesPage() {
 
   // Helper to count projects in a category
   const getProjectCount = (categoryId: string) => {
-    return projects.filter((p) => p.category_id === categoryId && p.is_published).length;
+    return projects.filter((p) => p.category_id.toLowerCase() === categoryId.toLowerCase() && p.is_published).length;
   };
 
   return (

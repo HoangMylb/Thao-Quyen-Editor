@@ -15,7 +15,7 @@ export default function CategoryDetailPage({ params }: PageProps) {
   const resolvedParams = use(params);
   const { projects, categories } = useSiteData();
 
-  const category = categories.find((c) => c.slug === resolvedParams.slug);
+  const category = categories.find((c) => c.slug.toLowerCase() === resolvedParams.slug.toLowerCase());
 
   if (!category) {
     return (
@@ -34,7 +34,7 @@ export default function CategoryDetailPage({ params }: PageProps) {
 
   // Filter projects by this category (only show published)
   const categoryProjects = projects.filter(
-    (p) => p.category_id === category.id && p.is_published
+    (p) => p.category_id.toLowerCase() === category.id.toLowerCase() && p.is_published
   );
 
   return (

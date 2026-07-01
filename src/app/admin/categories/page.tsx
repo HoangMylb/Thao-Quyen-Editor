@@ -16,7 +16,7 @@ export default function AdminCategoriesPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const getProjectCount = (catId: string) => {
-    return projects.filter((p) => p.category_id === catId).length;
+    return projects.filter((p) => p.category_id.toLowerCase() === catId.toLowerCase()).length;
   };
 
   const handleDelete = async (id: string, name: string) => {

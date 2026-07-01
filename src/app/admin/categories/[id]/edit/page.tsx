@@ -14,7 +14,7 @@ export default function EditCategoryPage({ params }: PageProps) {
   const resolvedParams = use(params);
   const { categories } = useSiteData();
   
-  const category = categories.find((c) => c.id === resolvedParams.id);
+  const category = categories.find((c) => c.id.toLowerCase() === resolvedParams.id.toLowerCase());
 
   if (!category) {
     return (

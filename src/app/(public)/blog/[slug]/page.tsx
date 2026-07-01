@@ -19,7 +19,7 @@ export default function BlogDetailPage({ params }: PageProps) {
   const resolvedParams = use(params);
   const { posts, profile } = useSiteData();
 
-  const post = posts.find((p) => p.slug === resolvedParams.slug && p.status === 'published');
+  const post = posts.find((p) => p.slug.toLowerCase() === resolvedParams.slug.toLowerCase() && p.status === 'published');
 
   if (!post) {
     return (

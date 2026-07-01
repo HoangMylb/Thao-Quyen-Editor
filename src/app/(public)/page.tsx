@@ -20,21 +20,21 @@ import {
 
 export default function HomePage() {
   const { projects, categories, posts, profile } = useSiteData();
-  
+
   // Video Popup State
   const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
   const [activeVideoTitle, setActiveVideoTitle] = useState<string | null>(null);
 
   // Get Featured Projects based on Admin settings, fall back to first 3 is_featured projects
-  const featuredIds = profile?.homepage_featured_project_ids || [];
+  const featuredIds = Array.from(new Set((profile?.homepage_featured_project_ids || []).map((id) => id.toLowerCase())));
   const featuredProjects = featuredIds.length > 0
-    ? (featuredIds.map(id => projects.find(p => p.id === id)).filter(Boolean) as typeof projects).filter(p => p.is_published)
+    ? (featuredIds.map(id => projects.find(p => p.id.toLowerCase() === id)).filter(Boolean) as typeof projects).filter(p => p.is_published)
     : projects.filter((p) => p.is_featured && p.is_published).slice(0, 3);
 
   // Get categories configured by Admin
-  const homeCategoryIds = profile?.homepage_category_ids || [];
+  const homeCategoryIds = Array.from(new Set((profile?.homepage_category_ids || []).map((id) => id.toLowerCase())));
   const homeCategories = homeCategoryIds.length > 0
-    ? (homeCategoryIds.map(id => categories.find(c => c.id === id)).filter(Boolean) as typeof categories)
+    ? (homeCategoryIds.map(id => categories.find(c => c.id.toLowerCase() === id)).filter(Boolean) as typeof categories)
     : categories;
 
   // Get Latest 3 Blog posts that are published
@@ -44,7 +44,7 @@ export default function HomePage() {
 
   // Helper to count projects in a category
   const getProjectCount = (categoryId: string) => {
-    return projects.filter((p) => p.category_id === categoryId && p.is_published).length;
+    return projects.filter((p) => p.category_id.toLowerCase() === categoryId.toLowerCase() && p.is_published).length;
   };
 
   const steps = [
@@ -162,7 +162,7 @@ export default function HomePage() {
           {featuredProjects.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredProjects.map((project) => {
-                const cat = categories.find((c) => c.id === project.category_id);
+                const cat = categories.find((c) => c.id.toLowerCase() === project.category_id.toLowerCase());
                 return (
                   <ProjectCard
                     key={project.id}
@@ -276,7 +276,7 @@ export default function HomePage() {
               <h2 className="text-3xl font-extrabold text-slate-900 sm:text-4xl tracking-tight leading-tight">
                 Sẵn sàng nâng tầm thương hiệu <br className="hidden sm:inline" /> của bạn bằng những thước phim triệu view?
               </h2>
-              <p className="text-sm max-w-md mx-auto leading-relaxed text-slate-600">
+              <p className="text-sm mx-auto leading-relaxed text-slate-600">
                 Hãy chia sẻ thông tin về sản phẩm, định hướng kênh và mục tiêu truyền thông để nhận tư vấn dựng video mẫu phù hợp nhất.
               </p>
               <div className="pt-4 flex justify-center">
@@ -297,7 +297,7 @@ export default function HomePage() {
       {activeVideoUrl && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop Overlay */}
-          <div 
+          <div
             className="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer transition-opacity duration-300"
             onClick={() => {
               setActiveVideoUrl(null);
@@ -310,7 +310,7 @@ export default function HomePage() {
             {/* Header Toolbar */}
             <div className="w-full flex items-center justify-between px-5 py-3.5 bg-black/40 border-b border-white/5 text-white">
               <h4 className="text-xs font-bold truncate pr-6 font-sans tracking-wide uppercase">{activeVideoTitle || "Xem Video"}</h4>
-              <button 
+              <button
                 onClick={() => {
                   setActiveVideoUrl(null);
                   setActiveVideoTitle(null);

@@ -14,7 +14,7 @@ export default function EditProjectPage({ params }: PageProps) {
   const resolvedParams = use(params);
   const { projects } = useSiteData();
   
-  const project = projects.find((p) => p.id === resolvedParams.id);
+  const project = projects.find((p) => p.id.toLowerCase() === resolvedParams.id.toLowerCase());
 
   if (!project) {
     return (

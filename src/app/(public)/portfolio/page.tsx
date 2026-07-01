@@ -19,7 +19,7 @@ export default function PortfolioPage() {
     .filter((p) => {
       const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
         p.short_description.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = selectedCategory === 'all' || p.category_id === selectedCategory;
+      const matchesCategory = selectedCategory === 'all' || p.category_id.toLowerCase() === selectedCategory.toLowerCase();
       return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
@@ -93,7 +93,7 @@ export default function PortfolioPage() {
       {filteredProjects.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProjects.map((project) => {
-            const cat = categories.find((c) => c.id === project.category_id);
+            const cat = categories.find((c) => c.id.toLowerCase() === project.category_id.toLowerCase());
             return (
               <ProjectCard
                 key={project.id}

@@ -34,7 +34,7 @@ export default function AdminProjectsPage() {
   // Filter projects
   const filteredProjects = projects.filter((p) => {
     const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || p.category_id === selectedCategory;
+    const matchesCategory = selectedCategory === 'all' || p.category_id.toLowerCase() === selectedCategory.toLowerCase();
     return matchesSearch && matchesCategory;
   });
 
@@ -103,7 +103,7 @@ export default function AdminProjectsPage() {
               </thead>
               <tbody className="divide-y divide-card-border">
                 {filteredProjects.map((proj) => {
-                  const cat = categories.find((c) => c.id === proj.category_id);
+                  const cat = categories.find((c) => c.id.toLowerCase() === proj.category_id.toLowerCase());
                   return (
                     <tr key={proj.id} className="hover:bg-slate-50/50 transition-colors">
                       {/* Name & Thumbnail */}
