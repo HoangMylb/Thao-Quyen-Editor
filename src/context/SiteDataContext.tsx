@@ -64,20 +64,27 @@ export function SiteDataProvider({ children }: { children: React.ReactNode }) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [profile, setProfile] = useState<Profile>(EMPTY_PROFILE);
   const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState('');
 
   const refreshDb = async () => {
-    const [nextProjects, nextCategories, nextPosts, nextProfile] = await Promise.all([
-      api.getProjects(),
-      api.getCategories(),
-      api.getPosts(),
-      api.getProfile(),
-    ]);
+    try {
+      setError('');
+      const [nextProjects, nextCategories, nextPosts, nextProfile] = await Promise.all([
+        api.getProjects(),
+        api.getCategories(),
+        api.getPosts(),
+        api.getProfile(),
+      ]);
 
-    setProjects(nextProjects);
-    setCategories(nextCategories);
-    setPosts(nextPosts);
-    setProfile(nextProfile);
-    setLoaded(true);
+      setProjects(nextProjects);
+      setCategories(nextCategories);
+      setPosts(nextPosts);
+      setProfile(nextProfile);
+    } catch (nextError) {
+      setError(nextError instanceof Error ? nextError.message : 'Không tải được dữ liệu từ máy chủ.');
+    } finally {
+      setLoaded(true);
+    }
   };
 
   useEffect(() => {
@@ -149,6 +156,32 @@ export function SiteDataProvider({ children }: { children: React.ReactNode }) {
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
           <p className="text-gray-400 font-mono text-sm tracking-widest">LOADING PORTFOLIO...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-[100dvh] bg-[#030712] flex items-center justify-center px-4">
+        <div className="max-w-md w-full rounded-2xl border border-red-500/20 bg-slate-900 p-6 text-center space-y-4">
+          <div className="w-12 h-12 mx-auto rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 text-xl">!</div>
+          <div className="space-y-2">
+            <h2 className="text-white font-semibold text-lg">Không tải được dữ liệu</h2>
+            <p className="text-slate-400 text-sm break-words">{error}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setLoaded(false);
+              window.setTimeout(() => {
+                void refreshDb();
+              }, 0);
+            }}
+            className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-500 transition-all"
+          >
+            Thử lại
+          </button>
         </div>
       </div>
     );

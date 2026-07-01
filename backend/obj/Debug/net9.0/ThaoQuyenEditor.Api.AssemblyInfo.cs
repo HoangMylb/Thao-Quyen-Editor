@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ThaoQuyenEditor.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f2e7c8ae5a79ec3a68e833219124ea50ab4de5ca")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f5e44bf9fccf208f7cc35c4d8dc5dc5d95188486")]
 [assembly: System.Reflection.AssemblyProductAttribute("ThaoQuyenEditor.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ThaoQuyenEditor.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

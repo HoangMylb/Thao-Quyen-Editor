@@ -73,7 +73,8 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(
                 "http://localhost:3000",
                 "http://localhost:3001",
-                "https://thaoquyen-editor.vercel.app"
+                "https://thaoquyen-editor.vercel.app",
+                "https://thao-quyen-editor.vercel.app"
             )
             .AllowAnyHeader()
             .AllowAnyMethod()
