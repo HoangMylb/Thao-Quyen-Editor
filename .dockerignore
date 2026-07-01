@@ -1,0 +1,8 @@
+node_modules
+.next
+.git
+backend/bin
+backend/obj
+backend/thaoquyen.db
+backend/thaoquyen.db-shm
+backend/thaoquyen.db-wal

@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: thaoquyen-editor-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: JwtSettings__SecretKey
+        generateValue: true
+      - key: JwtSettings__Issuer
+        value: ThaoQuyenEditor
+      - key: JwtSettings__Audience
+        value: ThaoQuyenEditorClient

@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { auth } from '@/lib/auth';
+import { createClient } from '@/utils/supabase/client';
 import {
   IconLayoutDashboard,
   IconVideo,
@@ -28,9 +28,11 @@ export default function AdminSidebar() {
     { label: 'Cấu hình Profile', href: '/admin/settings', icon: <IconSettings className="w-5 h-5" /> },
   ];
 
-  const handleLogout = () => {
-    auth.logout();
-    router.push('/login');
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.replace('/login');
+    router.refresh();
   };
 
   const isActive = (href: string) => {
