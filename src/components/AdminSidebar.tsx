@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/utils/supabase/client';
+import { logout } from '@/lib/api';
 import {
   IconLayoutDashboard,
   IconVideo,
@@ -13,12 +13,12 @@ import {
   IconArrowLeft,
   IconUser
 } from '@tabler/icons-react';
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 
 export default function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { profile } = useMockDb();
+  const { profile } = useSiteData();
 
   const menuItems = [
     { label: 'Tổng quan', href: '/admin', icon: <IconLayoutDashboard className="w-5 h-5" /> },
@@ -29,8 +29,7 @@ export default function AdminSidebar() {
   ];
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    logout();
     router.replace('/login');
     router.refresh();
   };

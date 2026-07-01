@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 import { IconSettings, IconCheck, IconUser } from '@tabler/icons-react';
 
 export default function AdminSettingsPage() {
-  const { profile, updateProfile, projects, categories } = useMockDb();
+  const { profile, updateProfile, projects, categories } = useSiteData();
   
   const [fullName, setFullName] = useState(profile?.full_name || '');
   const [headline, setHeadline] = useState(profile?.headline || '');
@@ -55,7 +55,7 @@ export default function AdminSettingsPage() {
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !email) return;
 
@@ -91,7 +91,7 @@ export default function AdminSettingsPage() {
       homepage_category_ids: homepageCategoryIds
     };
 
-    updateProfile(newProfile);
+    await updateProfile(newProfile);
     setSuccess(true);
     setTimeout(() => setSuccess(false), 3000);
   };

@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { IconBrandFacebook, IconBrandTiktok, IconBrandInstagram, IconBrandYoutube, IconMail } from '@tabler/icons-react';
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 
 export default function Footer() {
-  const { profile } = useMockDb();
+  const { profile } = useSiteData();
 
   return (
     <footer className="bg-slate-50 border-t border-card-border py-12 text-slate-600">

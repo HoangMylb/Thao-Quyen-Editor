@@ -2,7 +2,7 @@
 
 import React, { use } from 'react';
 import PostForm from '@/components/PostForm';
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 import Link from 'next/link';
 import { IconChevronLeft } from '@tabler/icons-react';
 
@@ -12,7 +12,7 @@ interface PageProps {
 
 export default function EditPostPage({ params }: PageProps) {
   const resolvedParams = use(params);
-  const { posts } = useMockDb();
+  const { posts } = useSiteData();
   
   const post = posts.find((p) => p.id === resolvedParams.id);
 

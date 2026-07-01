@@ -63,6 +63,9 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
     });
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -79,6 +82,9 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // ── Seed Data ────────────────────────────────────────────
 await SeedData.Initialize(app.Services);
@@ -97,5 +103,7 @@ app.MapGet("/api/health", () => Results.Ok(new
     Status = "Healthy",
     Timestamp = DateTime.UtcNow
 })).AllowAnonymous();
+
+app.MapGet("/swager", () => Results.Redirect("/swagger")).AllowAnonymous();
 
 app.Run();

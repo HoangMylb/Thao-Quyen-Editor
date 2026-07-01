@@ -2,7 +2,7 @@
 
 import React, { use } from 'react';
 import ProjectForm from '@/components/ProjectForm';
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 import Link from 'next/link';
 import { IconChevronLeft } from '@tabler/icons-react';
 
@@ -12,7 +12,7 @@ interface PageProps {
 
 export default function EditProjectPage({ params }: PageProps) {
   const resolvedParams = use(params);
-  const { projects } = useMockDb();
+  const { projects } = useSiteData();
   
   const project = projects.find((p) => p.id === resolvedParams.id);
 

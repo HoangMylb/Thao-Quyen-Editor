@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 import {
   IconPlus,
   IconSearch,
@@ -13,22 +13,22 @@ import {
 } from '@tabler/icons-react';
 
 export default function AdminProjectsPage() {
-  const { projects, categories, deleteProject, updateProject } = useMockDb();
+  const { projects, categories, deleteProject, updateProject } = useSiteData();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  const handleDelete = (id: string, title: string) => {
+  const handleDelete = async (id: string, title: string) => {
     if (confirm(`Bạn có chắc chắn muốn xóa dự án "${title}" không?`)) {
-      deleteProject(id);
+      await deleteProject(id);
     }
   };
 
-  const toggleFeatured = (id: string, currentVal: boolean) => {
-    updateProject(id, { is_featured: !currentVal });
+  const toggleFeatured = async (id: string, currentVal: boolean) => {
+    await updateProject(id, { is_featured: !currentVal });
   };
 
-  const togglePublished = (id: string, currentVal: boolean) => {
-    updateProject(id, { is_published: !currentVal });
+  const togglePublished = async (id: string, currentVal: boolean) => {
+    await updateProject(id, { is_published: !currentVal });
   };
 
   // Filter projects

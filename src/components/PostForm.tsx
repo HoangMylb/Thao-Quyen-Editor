@@ -2,8 +2,8 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useMockDb } from '@/context/MockDbContext';
-import { Post } from '@/lib/mockDb';
+import { useSiteData } from '@/context/SiteDataContext';
+import { Post } from '@/lib/types';
 import { generateSlug } from '@/lib/slugify';
 import { IconChevronLeft, IconArticle } from '@tabler/icons-react';
 
@@ -13,7 +13,7 @@ interface PostFormProps {
 
 export default function PostForm({ post }: PostFormProps) {
   const router = useRouter();
-  const { addPost, updatePost } = useMockDb();
+  const { addPost, updatePost } = useSiteData();
 
   const [title, setTitle] = useState(post?.title || '');
   const [slug, setSlug] = useState(post?.slug || '');
@@ -48,7 +48,7 @@ export default function PostForm({ post }: PostFormProps) {
     setSlug(generateSlug(newTitle));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !slug) return;
 
@@ -64,9 +64,9 @@ export default function PostForm({ post }: PostFormProps) {
 
     try {
       if (post) {
-        updatePost(post.id, postData);
+        await updatePost(post.id, postData);
       } else {
-        addPost(postData);
+        await addPost(postData);
       }
       router.push('/admin/posts');
     } catch (err: unknown) {

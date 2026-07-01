@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 import {
   IconVideo,
   IconCategory,
@@ -11,7 +11,7 @@ import {
 } from '@tabler/icons-react';
 
 export default function AdminDashboardPage() {
-  const { projects, categories, posts, profile } = useMockDb();
+  const { projects, categories, posts, profile } = useSiteData();
 
   // Metrics
   const totalProjects = projects.length;

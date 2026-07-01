@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/utils/supabase/client';
+import { isLoggedIn, login } from '@/lib/api';
 import { IconLock, IconMail, IconArrowLeft, IconVideo } from '@tabler/icons-react';
 
 export default function LoginPage() {
@@ -14,13 +14,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const supabase = createClient();
-
-    void supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        router.replace('/admin');
-      }
-    });
+    if (isLoggedIn()) {
+      router.replace('/admin');
+    }
   }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -28,21 +24,15 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
 
-    const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    setLoading(false);
-
-    if (signInError) {
-      setError(signInError.message || 'Email hoặc mật khẩu không chính xác.');
-      return;
+    try {
+      await login(email, password);
+      setLoading(false);
+      router.replace('/admin');
+      router.refresh();
+    } catch (error) {
+      setLoading(false);
+      setError(error instanceof Error ? error.message : 'Email hoặc mật khẩu không chính xác.');
     }
-
-    router.replace('/admin');
-    router.refresh();
   };
 
   return (

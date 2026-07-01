@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 import {
   IconBrandFacebook,
   IconBrandTiktok,
@@ -14,7 +14,7 @@ import {
 } from '@tabler/icons-react';
 
 export default function ContactPage() {
-  const { profile } = useMockDb();
+  const { profile } = useSiteData();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [projectType, setProjectType] = useState('tiktok');

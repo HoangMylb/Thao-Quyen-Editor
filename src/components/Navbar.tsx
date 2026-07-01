@@ -4,11 +4,11 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { IconMenu2, IconX, IconVideo } from '@tabler/icons-react';
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { profile } = useMockDb();
+  const { profile } = useSiteData();
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinks = [

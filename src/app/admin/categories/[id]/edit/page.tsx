@@ -2,7 +2,7 @@
 
 import React, { use } from 'react';
 import CategoryForm from '@/components/CategoryForm';
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 import Link from 'next/link';
 import { IconChevronLeft } from '@tabler/icons-react';
 
@@ -12,7 +12,7 @@ interface PageProps {
 
 export default function EditCategoryPage({ params }: PageProps) {
   const resolvedParams = use(params);
-  const { categories } = useMockDb();
+  const { categories } = useSiteData();
   
   const category = categories.find((c) => c.id === resolvedParams.id);
 

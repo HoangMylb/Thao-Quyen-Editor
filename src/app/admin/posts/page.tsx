@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 import {
   IconPlus,
   IconSearch,
@@ -12,12 +12,12 @@ import {
 } from '@tabler/icons-react';
 
 export default function AdminPostsPage() {
-  const { posts, deletePost } = useMockDb();
+  const { posts, deletePost } = useSiteData();
   const [searchQuery, setSearchQuery] = useState('');
 
-  const handleDelete = (id: string, title: string) => {
+  const handleDelete = async (id: string, title: string) => {
     if (confirm(`Bạn có chắc chắn muốn xóa bài viết "${title}" không?`)) {
-      deletePost(id);
+      await deletePost(id);
     }
   };
 

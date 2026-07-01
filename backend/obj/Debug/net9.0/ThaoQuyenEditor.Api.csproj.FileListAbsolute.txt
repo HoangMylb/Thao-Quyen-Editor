@@ -298,3 +298,8 @@
 /Users/my/Documents/GitHub/Thao-Quyen-Editor/backend/obj/Debug/net9.0/ref/ThaoQuyenEditor.Api.dll
 /Users/my/Documents/GitHub/Thao-Quyen-Editor/backend/bin/Debug/net9.0/Npgsql.dll
 /Users/my/Documents/GitHub/Thao-Quyen-Editor/backend/bin/Debug/net9.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll
+/Users/my/Documents/GitHub/Thao-Quyen-Editor/backend/bin/Debug/net9.0/Microsoft.OpenApi.dll
+/Users/my/Documents/GitHub/Thao-Quyen-Editor/backend/bin/Debug/net9.0/Swashbuckle.AspNetCore.Swagger.dll
+/Users/my/Documents/GitHub/Thao-Quyen-Editor/backend/bin/Debug/net9.0/Swashbuckle.AspNetCore.SwaggerGen.dll
+/Users/my/Documents/GitHub/Thao-Quyen-Editor/backend/bin/Debug/net9.0/Swashbuckle.AspNetCore.SwaggerUI.dll
+/Users/my/Documents/GitHub/Thao-Quyen-Editor/backend/obj/Debug/net9.0/ThaoQuyenEditor.Api.MvcApplicationPartsAssemblyInfo.cs

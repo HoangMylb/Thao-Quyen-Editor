@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { IconArrowUpRight, IconVideo } from '@tabler/icons-react';
-import { Category } from '@/lib/mockDb';
+import { Category } from '@/lib/types';
 
 interface CategoryCardProps {
   category: Category;

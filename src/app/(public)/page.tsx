@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 import ProjectCard from '@/components/ProjectCard';
 import CategoryCard from '@/components/CategoryCard';
 import BlogCard from '@/components/BlogCard';
@@ -19,7 +19,7 @@ import {
 } from '@tabler/icons-react';
 
 export default function HomePage() {
-  const { projects, categories, posts, profile } = useMockDb();
+  const { projects, categories, posts, profile } = useSiteData();
   
   // Video Popup State
   const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);

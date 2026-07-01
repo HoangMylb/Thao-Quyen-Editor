@@ -2,7 +2,7 @@
 
 import React, { use } from 'react';
 import Link from 'next/link';
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 import {
   IconChevronLeft,
   IconCalendar,
@@ -17,7 +17,7 @@ interface PageProps {
 
 export default function BlogDetailPage({ params }: PageProps) {
   const resolvedParams = use(params);
-  const { posts, profile } = useMockDb();
+  const { posts, profile } = useSiteData();
 
   const post = posts.find((p) => p.slug === resolvedParams.slug && p.status === 'published');
 

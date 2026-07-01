@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useMockDb } from '@/context/MockDbContext';
-import { Project } from '@/lib/mockDb';
+import { useSiteData } from '@/context/SiteDataContext';
+import { Project } from '@/lib/types';
 import { generateSlug } from '@/lib/slugify';
 import { IconChevronLeft, IconVideo } from '@tabler/icons-react';
 
@@ -13,7 +13,7 @@ interface ProjectFormProps {
 
 export default function ProjectForm({ project }: ProjectFormProps) {
   const router = useRouter();
-  const { categories, addProject, updateProject } = useMockDb();
+  const { categories, addProject, updateProject } = useSiteData();
 
   const [title, setTitle] = useState(project?.title || '');
   const [slug, setSlug] = useState(project?.slug || '');
@@ -34,7 +34,7 @@ export default function ProjectForm({ project }: ProjectFormProps) {
     setSlug(generateSlug(newTitle));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !slug || !categoryId) return;
 
@@ -63,9 +63,9 @@ export default function ProjectForm({ project }: ProjectFormProps) {
 
     try {
       if (project) {
-        updateProject(project.id, projectData);
+        await updateProject(project.id, projectData);
       } else {
-        addProject(projectData);
+        await addProject(projectData);
       }
       router.push('/admin/projects');
     } catch (err: unknown) {

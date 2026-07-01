@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { MockDbProvider } from "@/context/MockDbContext";
+import { SiteDataProvider } from "@/context/SiteDataContext";
 
 const montserrat = localFont({
   src: [
@@ -39,9 +39,9 @@ export default function RootLayout({
         className="min-h-full flex flex-col bg-[#f8fafc] text-[#0f172a]"
         suppressHydrationWarning
       >
-        <MockDbProvider>
+        <SiteDataProvider>
           {children}
-        </MockDbProvider>
+        </SiteDataProvider>
       </body>
     </html>
   );

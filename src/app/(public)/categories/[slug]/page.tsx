@@ -2,7 +2,7 @@
 
 import React, { use } from 'react';
 import Link from 'next/link';
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 import ProjectCard from '@/components/ProjectCard';
 import EmptyState from '@/components/EmptyState';
 import { IconChevronLeft } from '@tabler/icons-react';
@@ -13,7 +13,7 @@ interface PageProps {
 
 export default function CategoryDetailPage({ params }: PageProps) {
   const resolvedParams = use(params);
-  const { projects, categories } = useMockDb();
+  const { projects, categories } = useSiteData();
 
   const category = categories.find((c) => c.slug === resolvedParams.slug);
 

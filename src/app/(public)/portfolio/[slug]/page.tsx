@@ -3,7 +3,7 @@
 import React, { use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 import VideoEmbed from '@/components/VideoEmbed';
 import ProjectCard from '@/components/ProjectCard';
 import {
@@ -23,7 +23,7 @@ interface PageProps {
 export default function ProjectDetailPage({ params }: PageProps) {
   const router = useRouter();
   const resolvedParams = use(params);
-  const { projects, categories } = useMockDb();
+  const { projects, categories } = useSiteData();
 
   const project = projects.find((p) => p.slug === resolvedParams.slug && p.is_published);
 

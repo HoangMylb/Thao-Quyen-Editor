@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useMockDb } from '@/context/MockDbContext';
-import { Category } from '@/lib/mockDb';
+import { useSiteData } from '@/context/SiteDataContext';
+import { Category } from '@/lib/types';
 import { generateSlug } from '@/lib/slugify';
 import { IconChevronLeft, IconCategory } from '@tabler/icons-react';
 
@@ -13,7 +13,7 @@ interface CategoryFormProps {
 
 export default function CategoryForm({ category }: CategoryFormProps) {
   const router = useRouter();
-  const { addCategory, updateCategory } = useMockDb();
+  const { addCategory, updateCategory } = useSiteData();
 
   const [name, setName] = useState(category?.name || '');
   const [slug, setSlug] = useState(category?.slug || '');
@@ -26,7 +26,7 @@ export default function CategoryForm({ category }: CategoryFormProps) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !slug) return;
 
@@ -39,9 +39,9 @@ export default function CategoryForm({ category }: CategoryFormProps) {
 
     try {
       if (category) {
-        updateCategory(category.id, catData);
+        await updateCategory(category.id, catData);
       } else {
-        addCategory(catData);
+        await addCategory(catData);
       }
       router.push('/admin/categories');
     } catch (err: unknown) {

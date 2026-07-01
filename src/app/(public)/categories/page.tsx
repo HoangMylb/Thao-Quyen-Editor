@@ -1,10 +1,10 @@
 'use client';
 
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 import CategoryCard from '@/components/CategoryCard';
 
 export default function CategoriesPage() {
-  const { categories, projects } = useMockDb();
+  const { categories, projects } = useSiteData();
 
   // Helper to count projects in a category
   const getProjectCount = (categoryId: string) => {

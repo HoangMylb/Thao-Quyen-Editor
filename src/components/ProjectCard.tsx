@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { IconCalendar, IconUser, IconExternalLink, IconPlayerPlay } from '@tabler/icons-react';
-import { Project } from '@/lib/mockDb';
+import { Project } from '@/lib/types';
 
 interface ProjectCardProps {
   project: Project;

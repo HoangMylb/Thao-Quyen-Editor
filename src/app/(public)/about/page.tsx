@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 import {
   IconTool,
   IconClock,
@@ -14,7 +14,7 @@ import {
 } from '@tabler/icons-react';
 
 export default function AboutPage() {
-  const { profile } = useMockDb();
+  const { profile } = useSiteData();
 
   const skills = [
     { name: "Cắt dựng video ngắn", level: "95%", icon: <IconFlame className="w-4 h-4 text-emerald-600" /> },

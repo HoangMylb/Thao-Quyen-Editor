@@ -1,11 +1,11 @@
 'use client';
 
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 import BlogCard from '@/components/BlogCard';
 import EmptyState from '@/components/EmptyState';
 
 export default function BlogPage() {
-  const { posts } = useMockDb();
+  const { posts } = useSiteData();
 
   // Only show published articles
   const publishedPosts = posts.filter((p) => p.status === 'published');

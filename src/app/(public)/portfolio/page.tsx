@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 import ProjectCard from '@/components/ProjectCard';
 import EmptyState from '@/components/EmptyState';
 import { IconSearch, IconAdjustmentsHorizontal } from '@tabler/icons-react';
 
 export default function PortfolioPage() {
-  const { projects, categories } = useMockDb();
+  const { projects, categories } = useSiteData();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');

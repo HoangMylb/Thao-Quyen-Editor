@@ -1,22 +1,39 @@
 'use client';
 
 import AdminSidebar from '@/components/AdminSidebar';
-import { createClient } from '@/utils/supabase/client';
+import { isLoggedIn, logout } from '@/lib/api';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { IconLogout, IconMenu2, IconVideo } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [ready] = useState(() => isLoggedIn());
+
+  useEffect(() => {
+    if (!isLoggedIn()) {
+      router.replace('/login');
+    }
+  }, [router]);
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    logout();
     router.replace('/login');
     router.refresh();
   };
+
+  if (!ready) {
+    return (
+      <div className="min-h-[100dvh] bg-[#030712] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
+          <p className="text-gray-400 font-mono text-xs tracking-widest">VERIFYING ADMIN ACCESS...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-800 flex flex-col lg:flex-row">

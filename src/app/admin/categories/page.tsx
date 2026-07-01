@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useMockDb } from '@/context/MockDbContext';
+import { useSiteData } from '@/context/SiteDataContext';
 import {
   IconPlus,
   IconSearch,
@@ -12,14 +12,14 @@ import {
 } from '@tabler/icons-react';
 
 export default function AdminCategoriesPage() {
-  const { categories, projects, deleteCategory } = useMockDb();
+  const { categories, projects, deleteCategory } = useSiteData();
   const [searchQuery, setSearchQuery] = useState('');
 
   const getProjectCount = (catId: string) => {
     return projects.filter((p) => p.category_id === catId).length;
   };
 
-  const handleDelete = (id: string, name: string) => {
+  const handleDelete = async (id: string, name: string) => {
     const count = getProjectCount(id);
     if (count > 0) {
       alert(`Không thể xóa danh mục "${name}" vì có ${count} dự án đang thuộc danh mục này. Hãy đổi danh mục cho các dự án đó trước.`);
@@ -28,7 +28,7 @@ export default function AdminCategoriesPage() {
 
     if (confirm(`Bạn có chắc chắn muốn xóa danh mục "${name}" không?`)) {
       try {
-        deleteCategory(id);
+        await deleteCategory(id);
       } catch (err: unknown) {
         const error = err as Error;
         alert(error.message || 'Lỗi khi xóa danh mục.');

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { IconCalendar, IconArrowRight } from '@tabler/icons-react';
-import { Post } from '@/lib/mockDb';
+import { Post } from '@/lib/types';
 
 interface BlogCardProps {
   post: Post;
