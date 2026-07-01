@@ -48,7 +48,7 @@ export default function AboutPage() {
         {/* Right Side: Quick bio */}
         <div className="md:col-span-7 space-y-6">
           <div className="space-y-2">
-            <span className="text-emerald-700 font-mono text-xs tracking-widest uppercase">Video Editor · Born 22/12/2003</span>
+            <span className="text-emerald-700 font-mono text-xs tracking-widest uppercase">Video Editor </span>
             <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
               Mình là {profile?.full_name || 'Thảo Quyên'}
             </h1>

@@ -25,7 +25,7 @@ export default function ContactPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !message) return;
-    
+
     setSubmitting(true);
     setTimeout(() => {
       setSubmitting(false);
@@ -38,12 +38,6 @@ export default function ContactPage() {
   };
 
   const contactOptions = [
-    {
-      label: 'Email liên hệ',
-      value: profile?.email || 'contact@thaoquyen.com',
-      href: `mailto:${profile?.email || 'contact@thaoquyen.com'}`,
-      icon: <IconMail className="w-5 h-5 text-emerald-600" />
-    },
     {
       label: 'Số điện thoại / Zalo',
       value: profile?.phone || '0943851121',
@@ -74,7 +68,7 @@ export default function ContactPage() {
         <div className="lg:col-span-5 space-y-8">
           <div className="border border-card-border bg-white shadow-sm p-6 rounded-2xl space-y-6">
             <h3 className="text-base font-bold text-slate-900 tracking-wide uppercase border-b border-card-border pb-3">Liên lạc nhanh</h3>
-            
+
             <div className="space-y-6">
               {contactOptions.map((opt, idx) => (
                 <div key={idx} className="flex items-start gap-4">
@@ -124,7 +118,7 @@ export default function ContactPage() {
         <div className="lg:col-span-7">
           <div className="border border-card-border bg-white shadow-sm p-8 rounded-2xl space-y-6">
             <h3 className="text-lg font-bold text-slate-900 border-b border-card-border pb-3">Để lại tin nhắn cho Quyên</h3>
-            
+
             {submitted ? (
               <div className="text-center py-12 space-y-4">
                 <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">

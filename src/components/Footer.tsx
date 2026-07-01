@@ -26,26 +26,6 @@ export default function Footer() {
                   <IconBrandFacebook className="w-5 h-5" />
                 </a>
               )}
-              {profile?.tiktok_url && (
-                <a href={profile.tiktok_url} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
-                  <IconBrandTiktok className="w-5 h-5" />
-                </a>
-              )}
-              {profile?.instagram_url && (
-                <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
-                  <IconBrandInstagram className="w-5 h-5" />
-                </a>
-              )}
-              {profile?.youtube_url && (
-                <a href={profile.youtube_url} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
-                  <IconBrandYoutube className="w-5 h-5" />
-                </a>
-              )}
-              {profile?.email && (
-                <a href={`mailto:${profile.email}`} className="hover:text-primary transition-colors">
-                  <IconMail className="w-5 h-5" />
-                </a>
-              )}
             </div>
           </div>
 

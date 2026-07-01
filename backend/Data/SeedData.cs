@@ -35,8 +35,6 @@ public static class SeedData
             Headline = "Creative Video Editor for Brands, Creators & Businesses",
             ShortBio = "Dựng video quảng cáo, short-form content, Reels, TikTok, video bán hàng, video cá nhân & thương hiệu.",
             AboutContent = "Chào bạn, mình là Trịnh Thảo Quyên - một Video Editor đầy nhiệt huyết hoạt động tại TP. Hồ Chí Minh. Mình chuyên sâu về các định dạng video ngắn, Reels, TikTok, video sản phẩm và xây dựng thương hiệu cá nhân. Với mệnh Mộc (sinh ngày 22/12/2003), mình luôn hướng tới sự phát triển, sinh sôi và tươi mới. Mình mong muốn thổi hồn và mang lại sự sống động, sáng tạo cho từng thước phim của bạn để kết nối thương hiệu với khách hàng một cách mạnh mẽ nhất.",
-            AvatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&h=400&q=80",
-            Email = "contact@thaoquyen.com",
             Phone = "0943851121",
             ZaloUrl = "https://zalo.me/0943851121",
             FacebookUrl = "https://www.facebook.com/trinhquyen2911",

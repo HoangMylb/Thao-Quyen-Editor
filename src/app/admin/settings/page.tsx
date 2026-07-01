@@ -6,7 +6,7 @@ import { IconSettings, IconCheck, IconUser } from '@tabler/icons-react';
 
 export default function AdminSettingsPage() {
   const { profile, updateProfile, projects, categories } = useSiteData();
-  
+
   const [fullName, setFullName] = useState(profile?.full_name || '');
   const [headline, setHeadline] = useState(profile?.headline || '');
   const [shortBio, setShortBio] = useState(profile?.short_bio || '');
@@ -211,18 +211,6 @@ export default function AdminSettingsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Email */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-600">Email nhận việc *</label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="contact@thaoquyen.com"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-primary/50 focus:outline-none focus:bg-white transition-all"
-              />
-            </div>
 
             {/* Phone */}
             <div className="space-y-1.5">
