@@ -303,3 +303,4 @@
 /Users/my/Documents/GitHub/Thao-Quyen-Editor/backend/bin/Debug/net9.0/Swashbuckle.AspNetCore.SwaggerGen.dll
 /Users/my/Documents/GitHub/Thao-Quyen-Editor/backend/bin/Debug/net9.0/Swashbuckle.AspNetCore.SwaggerUI.dll
 /Users/my/Documents/GitHub/Thao-Quyen-Editor/backend/obj/Debug/net9.0/ThaoQuyenEditor.Api.MvcApplicationPartsAssemblyInfo.cs
+/Users/my/Documents/GitHub/Thao-Quyen-Editor/backend/bin/Debug/net9.0/System.Diagnostics.DiagnosticSource.dll

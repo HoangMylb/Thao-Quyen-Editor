@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using ThaoQuyenEditor.Api.DTOs.Request;
 using ThaoQuyenEditor.Api.DTOs.Response;
 using ThaoQuyenEditor.Api.Services;
@@ -20,6 +21,7 @@ public class PostsController : ControllerBase
     /// GET /api/posts — Get all posts (admin: includes drafts).
     /// </summary>
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<ApiResponse<List<PostResponse>>>> GetAll()
     {
         var posts = await _postService.GetAllAsync();
@@ -76,6 +78,7 @@ public class PostsController : ControllerBase
     /// POST /api/posts — Admin: create post.
     /// </summary>
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<ApiResponse<PostResponse>>> Create([FromBody] PostRequest request)
     {
         var post = await _postService.CreateAsync(request);
@@ -87,6 +90,7 @@ public class PostsController : ControllerBase
     /// PUT /api/posts/{id} — Admin: update post.
     /// </summary>
     [HttpPut("{id}")]
+    [Authorize]
     public async Task<ActionResult<ApiResponse<PostResponse>>> Update(string id, [FromBody] PostRequest request)
     {
         var post = await _postService.UpdateAsync(id, request);
@@ -100,6 +104,7 @@ public class PostsController : ControllerBase
     /// DELETE /api/posts/{id} — Admin: delete post.
     /// </summary>
     [HttpDelete("{id}")]
+    [Authorize]
     public async Task<ActionResult<ApiResponse<object>>> Delete(string id)
     {
         var success = await _postService.DeleteAsync(id);

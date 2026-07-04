@@ -60,7 +60,7 @@ export default function LoginPage() {
               <IconVideo className="h-6 w-6" />
             </span>
             <h2 className="text-xl font-bold text-slate-900 tracking-wide uppercase">Đăng nhập Admin</h2>
-            <p className="text-xs text-slate-550 max-w-xs leading-relaxed text-slate-500">
+            <p className="max-w-xs text-xs leading-relaxed text-slate-500">
               Trang đăng nhập dành cho Quản trị viên quản lý nội dung danh mục dự án và bài viết của Thảo Quyên.
             </p>
           </div>
@@ -68,7 +68,7 @@ export default function LoginPage() {
           {/* Form */}
           <form onSubmit={handleLogin} className="space-y-4">
             {error && (
-              <div className="rounded-xl bg-red-50 border border-red-100 p-3.5 text-center text-xs font-semibold text-red-650 text-red-650 text-red-650 text-red-650 text-red-600">
+              <div className="rounded-xl border border-red-100 bg-red-50 p-3.5 text-center text-xs font-semibold text-red-600">
                 {error}
               </div>
             )}

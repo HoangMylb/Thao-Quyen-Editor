@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSiteData } from '@/context/SiteDataContext';
 import ProjectCard from '@/components/ProjectCard';
 import EmptyState from '@/components/EmptyState';
+import SectionLoading from '@/components/SectionLoading';
 import { IconChevronLeft } from '@tabler/icons-react';
 
 interface PageProps {
@@ -13,9 +14,13 @@ interface PageProps {
 
 export default function CategoryDetailPage({ params }: PageProps) {
   const resolvedParams = use(params);
-  const { projects, categories } = useSiteData();
+  const { projects, categories, projectsLoading, categoriesLoading } = useSiteData();
 
   const category = categories.find((c) => c.slug.toLowerCase() === resolvedParams.slug.toLowerCase());
+
+  if (projectsLoading || categoriesLoading) {
+    return <div className="mx-auto max-w-7xl px-4 py-12"><SectionLoading title="Đang tải danh mục..." lines={4} /></div>;
+  }
 
   if (!category) {
     return (

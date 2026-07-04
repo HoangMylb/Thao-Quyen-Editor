@@ -4,6 +4,7 @@ import React, { use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSiteData } from '@/context/SiteDataContext';
+import SectionLoading from '@/components/SectionLoading';
 import VideoEmbed from '@/components/VideoEmbed';
 import ProjectCard from '@/components/ProjectCard';
 import {
@@ -23,9 +24,13 @@ interface PageProps {
 export default function ProjectDetailPage({ params }: PageProps) {
   const router = useRouter();
   const resolvedParams = use(params);
-  const { projects, categories } = useSiteData();
+  const { projects, categories, projectsLoading, categoriesLoading } = useSiteData();
 
   const project = projects.find((p) => p.slug.toLowerCase() === resolvedParams.slug.toLowerCase() && p.is_published);
+
+  if (projectsLoading || categoriesLoading) {
+    return <div className="mx-auto max-w-7xl px-4 py-12"><SectionLoading title="Đang tải dự án..." lines={4} /></div>;
+  }
 
   if (!project) {
     return (
@@ -151,7 +156,7 @@ export default function ProjectDetailPage({ params }: PageProps) {
                     <h4 className="text-slate-500 font-semibold mb-0.5">Công cụ sử dụng</h4>
                     <div className="flex flex-wrap gap-1.5 mt-1.5">
                       {project.tools_used.map((tool) => (
-                        <span key={tool} className="rounded bg-slate-50 border border-slate-200 px-2 py-0.5 text-[10px] font-mono text-slate-650 text-slate-600">
+                        <span key={tool} className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-mono text-slate-600">
                           {tool}
                         </span>
                       ))}

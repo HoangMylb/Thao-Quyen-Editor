@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { IconBrandFacebook, IconBrandTiktok, IconBrandInstagram, IconBrandYoutube, IconMail } from '@tabler/icons-react';
+import { IconBrandFacebook } from '@tabler/icons-react';
 import { useSiteData } from '@/context/SiteDataContext';
 
 export default function Footer() {

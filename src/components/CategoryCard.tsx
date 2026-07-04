@@ -25,7 +25,7 @@ export default function CategoryCard({ category, projectCount }: CategoryCardPro
             <IconVideo className="h-5 w-5" />
           </span>
           <span className="font-mono text-xs text-slate-500 bg-slate-100 border border-slate-200 rounded-full px-2.5 py-0.5">
-            {projectCount} {projectCount === 1 ? 'dự án' : 'dự án'}
+            {projectCount} dự án
           </span>
         </div>
 

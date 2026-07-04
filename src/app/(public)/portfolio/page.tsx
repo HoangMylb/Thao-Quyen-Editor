@@ -4,10 +4,11 @@ import { useState } from 'react';
 import { useSiteData } from '@/context/SiteDataContext';
 import ProjectCard from '@/components/ProjectCard';
 import EmptyState from '@/components/EmptyState';
+import SectionLoading from '@/components/SectionLoading';
 import { IconSearch, IconAdjustmentsHorizontal } from '@tabler/icons-react';
 
 export default function PortfolioPage() {
-  const { projects, categories } = useSiteData();
+  const { projects, categories, projectsLoading, categoriesLoading } = useSiteData();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -90,7 +91,9 @@ export default function PortfolioPage() {
       </div>
 
       {/* Catalog Grid */}
-      {filteredProjects.length > 0 ? (
+      {projectsLoading || categoriesLoading ? (
+        <SectionLoading title="Đang tải danh sách dự án..." lines={6} />
+      ) : filteredProjects.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProjects.map((project) => {
             const cat = categories.find((c) => c.id.toLowerCase() === project.category_id.toLowerCase());

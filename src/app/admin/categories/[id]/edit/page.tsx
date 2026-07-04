@@ -3,6 +3,7 @@
 import React, { use } from 'react';
 import CategoryForm from '@/components/CategoryForm';
 import { useSiteData } from '@/context/SiteDataContext';
+import SectionLoading from '@/components/SectionLoading';
 import Link from 'next/link';
 import { IconChevronLeft } from '@tabler/icons-react';
 
@@ -12,9 +13,13 @@ interface PageProps {
 
 export default function EditCategoryPage({ params }: PageProps) {
   const resolvedParams = use(params);
-  const { categories } = useSiteData();
+  const { categories, categoriesLoading } = useSiteData();
   
   const category = categories.find((c) => c.id.toLowerCase() === resolvedParams.id.toLowerCase());
+
+  if (categoriesLoading) {
+    return <div className="max-w-4xl mx-auto"><SectionLoading title="Đang tải dữ liệu danh mục..." lines={3} /></div>;
+  }
 
   if (!category) {
     return (

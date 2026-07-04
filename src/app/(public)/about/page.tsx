@@ -37,6 +37,7 @@ export default function AboutPage() {
           <div className="relative group aspect-square w-72 h-72 sm:w-80 sm:h-80 md:w-full md:max-w-sm overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-md">
             {/* Animated ambient glow inside image */}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-200/50 via-transparent to-transparent z-10"></div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={profile?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80'}
               alt={profile?.full_name || 'Thảo Quyên'}
@@ -137,7 +138,7 @@ export default function AboutPage() {
         {/* Tools & Workflow */}
         <div className="space-y-6">
           <h2 className="text-xl font-bold text-slate-900 border-b border-card-border pb-3">Công cụ & Ứng dụng</h2>
-          <p className="text-sm text-slate-650 leading-relaxed text-slate-600">
+            <p className="text-sm leading-relaxed text-slate-600">
             Sử dụng thành thạo bộ công cụ Adobe phục vụ biên tập hậu kỳ cao cấp cùng các công cụ AI tạo hình mới nhất nhằm đa dạng hóa góc nhìn nghệ thuật.
           </p>
           <div className="flex flex-wrap gap-2 pt-2">

@@ -21,6 +21,7 @@ public class PostService : IPostService
     public async Task<List<PostResponse>> GetAllAsync()
     {
         var posts = await _context.Posts
+            .AsNoTracking()
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
 
@@ -30,6 +31,7 @@ public class PostService : IPostService
     public async Task<List<PostResponse>> GetPublishedAsync()
     {
         var posts = await _context.Posts
+            .AsNoTracking()
             .Where(p => p.Status == "published")
             .OrderByDescending(p => p.PublishedAt)
             .ToListAsync();
@@ -40,6 +42,7 @@ public class PostService : IPostService
     public async Task<List<PostResponse>> GetLatestAsync(int take = 3)
     {
         var posts = await _context.Posts
+            .AsNoTracking()
             .Where(p => p.Status == "published")
             .OrderByDescending(p => p.PublishedAt)
             .Take(take)
@@ -52,13 +55,16 @@ public class PostService : IPostService
     {
         if (!Guid.TryParse(id, out var guid)) return null;
 
-        var post = await _context.Posts.FindAsync(guid);
+        var post = await _context.Posts
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == guid);
         return post == null ? null : _mapper.Map<PostResponse>(post);
     }
 
     public async Task<PostResponse?> GetBySlugAsync(string slug)
     {
         var post = await _context.Posts
+            .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Slug == slug);
 
         return post == null ? null : _mapper.Map<PostResponse>(post);

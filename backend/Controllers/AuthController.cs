@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using ThaoQuyenEditor.Api.DTOs.Request;
 using ThaoQuyenEditor.Api.DTOs.Response;
 using ThaoQuyenEditor.Api.Services;
@@ -38,9 +39,10 @@ public class AuthController : ControllerBase
     /// POST /api/auth/change-password — Change admin password (requires auth).
     /// </summary>
     [HttpPost("change-password")]
+    [Authorize]
     public async Task<ActionResult<ApiResponse<object>>> ChangePassword([FromBody] ChangePasswordRequest request)
     {
-        var userId = HttpContext.Items["UserId"]?.ToString();
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId))
         {
             return Unauthorized(ApiResponse<object>.Fail("Chưa xác thực."));

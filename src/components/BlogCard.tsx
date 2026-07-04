@@ -36,14 +36,17 @@ export default function BlogCard({ post }: BlogCardProps) {
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <img
-            src={post.thumbnail_url && (post.thumbnail_url.includes('youtube.com') || post.thumbnail_url.includes('youtu.be'))
-              ? `https://img.youtube.com/vi/${post.thumbnail_url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/)?.[2] || ''}/0.jpg`
-              : post.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=600&q=80'}
-            alt={post.title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-          />
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={post.thumbnail_url && (post.thumbnail_url.includes('youtube.com') || post.thumbnail_url.includes('youtu.be'))
+                ? `https://img.youtube.com/vi/${post.thumbnail_url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/)?.[2] || ''}/0.jpg`
+                : post.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=600&q=80'}
+              alt={post.title}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              loading="lazy"
+            />
+          </>
         )}
       </Link>
 

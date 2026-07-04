@@ -3,6 +3,7 @@
 import React, { use } from 'react';
 import PostForm from '@/components/PostForm';
 import { useSiteData } from '@/context/SiteDataContext';
+import SectionLoading from '@/components/SectionLoading';
 import Link from 'next/link';
 import { IconChevronLeft } from '@tabler/icons-react';
 
@@ -12,9 +13,13 @@ interface PageProps {
 
 export default function EditPostPage({ params }: PageProps) {
   const resolvedParams = use(params);
-  const { posts } = useSiteData();
+  const { posts, postsLoading } = useSiteData();
   
   const post = posts.find((p) => p.id.toLowerCase() === resolvedParams.id.toLowerCase());
+
+  if (postsLoading) {
+    return <div className="max-w-4xl mx-auto"><SectionLoading title="Đang tải dữ liệu bài viết..." lines={4} /></div>;
+  }
 
   if (!post) {
     return (

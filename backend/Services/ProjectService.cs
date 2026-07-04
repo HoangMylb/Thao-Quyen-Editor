@@ -21,6 +21,7 @@ public class ProjectService : IProjectService
     public async Task<List<ProjectResponse>> GetAllAsync()
     {
         var projects = await _context.Projects
+            .AsNoTracking()
             .Include(p => p.Category)
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
@@ -33,6 +34,7 @@ public class ProjectService : IProjectService
         if (!Guid.TryParse(id, out var guid)) return null;
 
         var project = await _context.Projects
+            .AsNoTracking()
             .Include(p => p.Category)
             .FirstOrDefaultAsync(p => p.Id == guid);
 
@@ -42,6 +44,7 @@ public class ProjectService : IProjectService
     public async Task<ProjectResponse?> GetBySlugAsync(string slug)
     {
         var project = await _context.Projects
+            .AsNoTracking()
             .Include(p => p.Category)
             .FirstOrDefaultAsync(p => p.Slug == slug);
 
@@ -98,6 +101,7 @@ public class ProjectService : IProjectService
     public async Task<List<ProjectResponse>> GetFeaturedAsync()
     {
         var projects = await _context.Projects
+            .AsNoTracking()
             .Include(p => p.Category)
             .Where(p => p.IsFeatured && p.IsPublished)
             .OrderByDescending(p => p.ProjectDate)
@@ -113,6 +117,7 @@ public class ProjectService : IProjectService
             return new List<ProjectResponse>();
 
         var projects = await _context.Projects
+            .AsNoTracking()
             .Include(p => p.Category)
             .Where(p => p.CategoryId == guid && p.IsPublished)
             .OrderByDescending(p => p.ProjectDate)
@@ -126,10 +131,13 @@ public class ProjectService : IProjectService
         if (!Guid.TryParse(projectId, out var guid))
             return new List<ProjectResponse>();
 
+        take = Math.Clamp(take, 1, 12);
+
         var project = await _context.Projects.FindAsync(guid);
         if (project == null) return new List<ProjectResponse>();
 
         var related = await _context.Projects
+            .AsNoTracking()
             .Include(p => p.Category)
             .Where(p => p.CategoryId == project.CategoryId && p.Id != guid && p.IsPublished)
             .OrderByDescending(p => p.ProjectDate)

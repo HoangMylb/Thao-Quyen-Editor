@@ -44,12 +44,15 @@ export default function ProjectCard({ project, categoryName, onPlay }: ProjectCa
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <img
-            src={ytId ? `https://img.youtube.com/vi/${ytId}/0.jpg` : 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80'}
-            alt={project.title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-          />
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={ytId ? `https://img.youtube.com/vi/${ytId}/0.jpg` : 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80'}
+              alt={project.title}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              loading="lazy"
+            />
+          </>
         )}
         
         {/* Play Icon Overlay */}

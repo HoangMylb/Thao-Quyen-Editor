@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using ThaoQuyenEditor.Api.DTOs.Request;
 using ThaoQuyenEditor.Api.DTOs.Response;
 using ThaoQuyenEditor.Api.Services;
@@ -56,6 +57,7 @@ public class CategoriesController : ControllerBase
     /// POST /api/categories — Admin: create category.
     /// </summary>
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<ApiResponse<CategoryResponse>>> Create([FromBody] CategoryRequest request)
     {
         var category = await _categoryService.CreateAsync(request);
@@ -67,6 +69,7 @@ public class CategoriesController : ControllerBase
     /// PUT /api/categories/{id} — Admin: update category.
     /// </summary>
     [HttpPut("{id}")]
+    [Authorize]
     public async Task<ActionResult<ApiResponse<CategoryResponse>>> Update(string id, [FromBody] CategoryRequest request)
     {
         var category = await _categoryService.UpdateAsync(id, request);
@@ -80,6 +83,7 @@ public class CategoriesController : ControllerBase
     /// DELETE /api/categories/{id} — Admin: delete category (fails if projects exist).
     /// </summary>
     [HttpDelete("{id}")]
+    [Authorize]
     public async Task<ActionResult<ApiResponse<object>>> Delete(string id)
     {
         try

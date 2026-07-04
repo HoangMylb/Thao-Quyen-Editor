@@ -20,7 +20,9 @@ public class ProfileService : IProfileService
 
     public async Task<ProfileResponse> GetProfileAsync()
     {
-        var profile = await _context.Profiles.FirstOrDefaultAsync();
+        var profile = await _context.Profiles
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
         if (profile == null)
         {
             throw new InvalidOperationException("Profile chưa được khởi tạo.");

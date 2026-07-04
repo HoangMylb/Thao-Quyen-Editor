@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using ThaoQuyenEditor.Api.DTOs.Request;
 using ThaoQuyenEditor.Api.DTOs.Response;
 using ThaoQuyenEditor.Api.Services;
@@ -20,6 +21,7 @@ public class ContactMessagesController : ControllerBase
     /// GET /api/contactmessages — Admin: get all contact messages.
     /// </summary>
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<ApiResponse<List<ContactMessageResponse>>>> GetAll()
     {
         var messages = await _contactService.GetAllAsync();
@@ -41,6 +43,7 @@ public class ContactMessagesController : ControllerBase
     /// DELETE /api/contactmessages/{id} — Admin: delete a contact message.
     /// </summary>
     [HttpDelete("{id}")]
+    [Authorize]
     public async Task<ActionResult<ApiResponse<object>>> Delete(string id)
     {
         var success = await _contactService.DeleteAsync(id);

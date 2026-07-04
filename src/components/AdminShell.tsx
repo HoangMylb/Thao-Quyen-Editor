@@ -59,7 +59,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           </button>
           <button
             onClick={handleLogout}
-            className="p-1.5 text-red-500 hover:text-red-650 rounded-lg bg-red-50 border border-red-100"
+            className="rounded-lg border border-red-100 bg-red-50 p-1.5 text-red-500 hover:text-red-600"
             aria-label="Đăng xuất"
           >
             <IconLogout className="w-5 h-5" />

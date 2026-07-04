@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using ThaoQuyenEditor.Api.DTOs.Response;
 using ThaoQuyenEditor.Api.Services;
 
@@ -19,6 +20,7 @@ public class DashboardController : ControllerBase
     /// GET /api/dashboard/stats — Admin: get dashboard statistics.
     /// </summary>
     [HttpGet("stats")]
+    [Authorize]
     public async Task<ActionResult<ApiResponse<DashboardStatsResponse>>> GetStats()
     {
         var stats = await _dashboardService.GetStatsAsync();

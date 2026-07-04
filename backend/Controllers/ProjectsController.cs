@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using ThaoQuyenEditor.Api.DTOs.Request;
 using ThaoQuyenEditor.Api.DTOs.Response;
 using ThaoQuyenEditor.Api.Services;
@@ -86,6 +87,7 @@ public class ProjectsController : ControllerBase
     /// POST /api/projects — Admin: create project.
     /// </summary>
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<ApiResponse<ProjectResponse>>> Create([FromBody] ProjectRequest request)
     {
         var project = await _projectService.CreateAsync(request);
@@ -97,6 +99,7 @@ public class ProjectsController : ControllerBase
     /// PUT /api/projects/{id} — Admin: update project.
     /// </summary>
     [HttpPut("{id}")]
+    [Authorize]
     public async Task<ActionResult<ApiResponse<ProjectResponse>>> Update(string id, [FromBody] ProjectRequest request)
     {
         var project = await _projectService.UpdateAsync(id, request);
@@ -110,6 +113,7 @@ public class ProjectsController : ControllerBase
     /// DELETE /api/projects/{id} — Admin: delete project.
     /// </summary>
     [HttpDelete("{id}")]
+    [Authorize]
     public async Task<ActionResult<ApiResponse<object>>> Delete(string id)
     {
         var success = await _projectService.DeleteAsync(id);

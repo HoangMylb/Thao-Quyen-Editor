@@ -7,7 +7,6 @@ import {
   IconBrandTiktok,
   IconBrandInstagram,
   IconBrandYoutube,
-  IconMail,
   IconPhone,
   IconSend,
   IconCheck

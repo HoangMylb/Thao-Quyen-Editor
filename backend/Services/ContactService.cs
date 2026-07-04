@@ -21,6 +21,7 @@ public class ContactService : IContactService
     public async Task<List<ContactMessageResponse>> GetAllAsync()
     {
         var messages = await _context.ContactMessages
+            .AsNoTracking()
             .OrderByDescending(m => m.CreatedAt)
             .ToListAsync();
 

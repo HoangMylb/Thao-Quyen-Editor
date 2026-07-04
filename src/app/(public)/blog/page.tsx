@@ -3,9 +3,10 @@
 import { useSiteData } from '@/context/SiteDataContext';
 import BlogCard from '@/components/BlogCard';
 import EmptyState from '@/components/EmptyState';
+import SectionLoading from '@/components/SectionLoading';
 
 export default function BlogPage() {
-  const { posts } = useSiteData();
+  const { posts, postsLoading } = useSiteData();
 
   // Only show published articles
   const publishedPosts = posts.filter((p) => p.status === 'published');
@@ -15,13 +16,15 @@ export default function BlogPage() {
       {/* Page Header */}
       <div className="space-y-4 max-w-xl">
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Góc Chia Sẻ</h1>
-        <p className="text-sm text-slate-605 leading-relaxed text-slate-600">
+        <p className="text-sm leading-relaxed text-slate-600">
           Nơi cập nhật kinh nghiệm làm việc, kỹ năng hậu kỳ, tư duy biên kịch hình ảnh và các xu hướng video ngắn mới nhất.
         </p>
       </div>
 
       {/* Blog Cards Grid */}
-      {publishedPosts.length > 0 ? (
+      {postsLoading ? (
+        <SectionLoading title="Đang tải danh sách bài viết..." lines={3} />
+      ) : publishedPosts.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {publishedPosts.map((post) => (
             <BlogCard key={post.id} post={post} />

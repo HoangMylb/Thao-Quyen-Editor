@@ -18,7 +18,7 @@ import { useSiteData } from '@/context/SiteDataContext';
 export default function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { profile } = useSiteData();
+  const { profile, profileLoading } = useSiteData();
 
   const menuItems = [
     { label: 'Tổng quan', href: '/admin', icon: <IconLayoutDashboard className="w-5 h-5" /> },
@@ -46,14 +46,24 @@ export default function AdminSidebar() {
         {/* Profile Tagline */}
         <div className="flex items-center gap-3 px-2">
           <div className="h-10 w-10 overflow-hidden rounded-full border border-emerald-500/20 bg-emerald-50 flex items-center justify-center text-emerald-600">
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt={profile.full_name} className="h-full w-full object-cover" />
+            {!profileLoading && profile?.avatar_url ? (
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={profile.avatar_url} alt={profile.full_name} className="h-full w-full object-cover" />
+              </>
             ) : (
               <IconUser className="w-5 h-5" />
             )}
           </div>
           <div>
-            <h4 className="text-sm font-bold text-slate-900 leading-none">{profile?.full_name || 'Thảo Quyên'}</h4>
+            {profileLoading ? (
+              <div className="space-y-1.5 animate-pulse">
+                <div className="h-3 w-24 rounded bg-slate-200" />
+                <div className="h-2 w-16 rounded bg-slate-100" />
+              </div>
+            ) : (
+              <h4 className="text-sm font-bold text-slate-900 leading-none">{profile?.full_name || 'Thảo Quyên'}</h4>
+            )}
             <span className="text-[10px] text-emerald-700 font-mono tracking-wider uppercase mt-1 block">Administrator</span>
           </div>
         </div>

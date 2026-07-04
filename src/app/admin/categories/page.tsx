@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useSiteData } from '@/context/SiteDataContext';
+import SectionLoading from '@/components/SectionLoading';
 import {
   IconPlus,
   IconSearch,
@@ -12,7 +13,7 @@ import {
 } from '@tabler/icons-react';
 
 export default function AdminCategoriesPage() {
-  const { categories, projects, deleteCategory } = useSiteData();
+  const { categories, projects, deleteCategory, categoriesLoading, projectsLoading } = useSiteData();
   const [searchQuery, setSearchQuery] = useState('');
 
   const getProjectCount = (catId: string) => {
@@ -76,7 +77,9 @@ export default function AdminCategoriesPage() {
       </div>
 
       {/* Grid of Categories */}
-      {filteredCategories.length > 0 ? (
+      {categoriesLoading || projectsLoading ? (
+        <SectionLoading title="Đang tải danh mục quản trị..." lines={4} />
+      ) : filteredCategories.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredCategories.map((cat) => {
             const projCount = getProjectCount(cat.id);

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using ThaoQuyenEditor.Api.DTOs.Request;
 using ThaoQuyenEditor.Api.DTOs.Response;
 using ThaoQuyenEditor.Api.Services;
@@ -30,6 +31,7 @@ public class ProfileController : ControllerBase
     /// PUT /api/profile — Admin: update profile.
     /// </summary>
     [HttpPut]
+    [Authorize]
     public async Task<ActionResult<ApiResponse<ProfileResponse>>> UpdateProfile([FromBody] ProfileRequest request)
     {
         var profile = await _profileService.UpdateProfileAsync(request);

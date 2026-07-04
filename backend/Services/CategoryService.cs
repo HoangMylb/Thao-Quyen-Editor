@@ -21,6 +21,7 @@ public class CategoryService : ICategoryService
     public async Task<List<CategoryResponse>> GetAllAsync()
     {
         var categories = await _context.Categories
+            .AsNoTracking()
             .Include(c => c.Projects)
             .OrderBy(c => c.Name)
             .ToListAsync();
@@ -33,6 +34,7 @@ public class CategoryService : ICategoryService
         if (!Guid.TryParse(id, out var guid)) return null;
 
         var category = await _context.Categories
+            .AsNoTracking()
             .Include(c => c.Projects)
             .FirstOrDefaultAsync(c => c.Id == guid);
 
@@ -42,6 +44,7 @@ public class CategoryService : ICategoryService
     public async Task<CategoryResponse?> GetBySlugAsync(string slug)
     {
         var category = await _context.Categories
+            .AsNoTracking()
             .Include(c => c.Projects)
             .FirstOrDefaultAsync(c => c.Slug == slug);
 

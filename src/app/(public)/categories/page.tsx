@@ -2,9 +2,10 @@
 
 import { useSiteData } from '@/context/SiteDataContext';
 import CategoryCard from '@/components/CategoryCard';
+import SectionLoading from '@/components/SectionLoading';
 
 export default function CategoriesPage() {
-  const { categories, projects } = useSiteData();
+  const { categories, projects, categoriesLoading, projectsLoading } = useSiteData();
 
   // Helper to count projects in a category
   const getProjectCount = (categoryId: string) => {
@@ -16,21 +17,25 @@ export default function CategoriesPage() {
       {/* Page Header */}
       <div className="space-y-4 max-w-xl">
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Danh mục Video</h1>
-        <p className="text-sm text-slate-650 leading-relaxed text-slate-650 text-slate-600">
+        <p className="text-sm leading-relaxed text-slate-600">
           Phân loại các thể loại video giúp khách hàng dễ dàng tiếp cận với đúng định hướng phong cách thương hiệu mong muốn.
         </p>
       </div>
 
       {/* Categories Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {categories.map((category) => (
-          <CategoryCard
-            key={category.id}
-            category={category}
-            projectCount={getProjectCount(category.id)}
-          />
-        ))}
-      </div>
+      {categoriesLoading || projectsLoading ? (
+        <SectionLoading title="Đang tải danh mục..." lines={6} />
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {categories.map((category) => (
+            <CategoryCard
+              key={category.id}
+              category={category}
+              projectCount={getProjectCount(category.id)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useSiteData } from '@/context/SiteDataContext';
+import SectionLoading from '@/components/SectionLoading';
 import {
   IconVideo,
   IconCategory,
@@ -11,7 +12,7 @@ import {
 } from '@tabler/icons-react';
 
 export default function AdminDashboardPage() {
-  const { projects, categories, posts, profile } = useSiteData();
+  const { projects, categories, posts, profile, projectsLoading, categoriesLoading, postsLoading, profileLoading } = useSiteData();
 
   // Metrics
   const totalProjects = projects.length;
@@ -36,21 +37,21 @@ export default function AdminDashboardPage() {
       value: totalProjects,
       desc: `${featuredProjectsCount} dự án nổi bật`,
       icon: <IconVideo className="w-6 h-6 text-emerald-600" />,
-      color: 'bg-emerald-50 border-emerald-250 bg-emerald-50 border-emerald-200'
+      color: 'bg-emerald-50 border-emerald-200'
     },
     {
       label: 'Tổng Categories',
       value: totalCategories,
       desc: 'Danh mục phân loại video',
       icon: <IconCategory className="w-6 h-6 text-sky-600" />,
-      color: 'bg-sky-50 border-sky-250 bg-sky-50 border-sky-200'
+      color: 'bg-sky-50 border-sky-200'
     },
     {
       label: 'Bài viết Blog',
       value: totalPosts,
       desc: `${publishedPostsCount} xuất bản, ${draftPostsCount} nháp`,
       icon: <IconArticle className="w-6 h-6 text-teal-600" />,
-      color: 'bg-teal-50 border-teal-250 bg-teal-50 border-teal-200'
+      color: 'bg-teal-50 border-teal-200'
     }
   ];
 
@@ -60,7 +61,7 @@ export default function AdminDashboardPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight sm:text-3xl">Dashboard Tổng quan</h1>
-          <p className="text-xs text-slate-550 text-slate-500">Xin chào, {profile?.full_name || 'Thảo Quyên'}. Chào mừng quay trở lại trang quản trị.</p>
+          <p className="text-xs text-slate-500">Xin chào, {profile?.full_name || 'Thảo Quyên'}. Chào mừng quay trở lại trang quản trị.</p>
         </div>
         
         {/* Quick Actions */}
@@ -74,7 +75,7 @@ export default function AdminDashboardPage() {
           </Link>
           <Link
             href="/admin/posts/new"
-            className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-100 px-4 py-2.5 text-xs font-semibold text-slate-800 hover:bg-slate-205 hover:bg-slate-200 shadow-sm"
+            className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-100 px-4 py-2.5 text-xs font-semibold text-slate-800 shadow-sm hover:bg-slate-200"
           >
             <IconPlus className="w-4 h-4" />
             Viết Blog
@@ -83,22 +84,29 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {stats.map((stat, idx) => (
-          <div key={idx} className={`border p-6 rounded-2xl flex items-center justify-between bg-white border-card-border shadow-sm`}>
-            <div className="space-y-2">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest">{stat.label}</span>
-              <div className="text-3xl font-extrabold text-slate-900">{stat.value}</div>
-              <p className="text-xs text-slate-500">{stat.desc}</p>
+      {projectsLoading || categoriesLoading || postsLoading ? (
+        <SectionLoading title="Đang tải số liệu dashboard..." lines={3} />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {stats.map((stat, idx) => (
+            <div key={idx} className={`border p-6 rounded-2xl flex items-center justify-between bg-white border-card-border shadow-sm`}>
+              <div className="space-y-2">
+                <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest">{stat.label}</span>
+                <div className="text-3xl font-extrabold text-slate-900">{stat.value}</div>
+                <p className="text-xs text-slate-500">{stat.desc}</p>
+              </div>
+              <div className={`h-12 w-12 rounded-xl flex items-center justify-center border ${stat.color}`}>
+                {stat.icon}
+              </div>
             </div>
-            <div className={`h-12 w-12 rounded-xl flex items-center justify-center border ${stat.color}`}>
-              {stat.icon}
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Lists split screen */}
+      {projectsLoading || postsLoading || profileLoading ? (
+        <SectionLoading title="Đang tải nội dung quản trị..." lines={4} />
+      ) : (
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         {/* Recent Projects */}
         <div className="border border-card-border bg-white shadow-sm p-6 rounded-2xl space-y-4">
@@ -120,13 +128,16 @@ export default function AdminDashboardPage() {
                     {proj.video_url && !proj.video_url.includes('youtube.com') && !proj.video_url.includes('youtu.be') && !proj.video_url.includes('vimeo.com') ? (
                       <video src={proj.video_url} muted className="h-full w-full object-cover" />
                     ) : (
-                      <img 
-                        src={proj.video_url && (proj.video_url.includes('youtube.com') || proj.video_url.includes('youtu.be'))
-                          ? `https://img.youtube.com/vi/${proj.video_url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/)?.[2] || ''}/0.jpg`
-                          : proj.thumbnail_url || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80'} 
-                        alt="" 
-                        className="h-full w-full object-cover" 
-                      />
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img 
+                          src={proj.video_url && (proj.video_url.includes('youtube.com') || proj.video_url.includes('youtu.be'))
+                            ? `https://img.youtube.com/vi/${proj.video_url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/)?.[2] || ''}/0.jpg`
+                            : proj.thumbnail_url || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80'} 
+                          alt="" 
+                          className="h-full w-full object-cover" 
+                        />
+                      </>
                     )}
                   </div>
                   <div>
@@ -146,13 +157,13 @@ export default function AdminDashboardPage() {
                       Active
                     </span>
                   ) : (
-                    <span className="text-[9px] font-bold text-slate-550 text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 uppercase tracking-wider">
+                      <span className="rounded border border-slate-200 bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">
                       Draft
                     </span>
                   )}
                   <Link
                     href={`/admin/projects/${proj.id}/edit`}
-                    className="p-1.5 text-slate-500 hover:text-primary bg-slate-100 border border-slate-250 border-slate-200 rounded-lg transition-colors"
+                    className="rounded-lg border border-slate-200 bg-slate-100 p-1.5 text-slate-500 transition-colors hover:text-primary"
                   >
                     <IconEdit className="w-3.5 h-3.5" />
                   </Link>
@@ -182,13 +193,16 @@ export default function AdminDashboardPage() {
                     {post.thumbnail_url && (post.thumbnail_url.startsWith('data:video/') || post.thumbnail_url.includes('.mp4') || post.thumbnail_url.includes('video')) ? (
                       <video src={post.thumbnail_url} muted className="h-full w-full object-cover" />
                     ) : (
-                      <img 
-                        src={post.thumbnail_url && (post.thumbnail_url.includes('youtube.com') || post.thumbnail_url.includes('youtu.be'))
-                          ? `https://img.youtube.com/vi/${post.thumbnail_url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/)?.[2] || ''}/0.jpg`
-                          : post.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=600&q=80'} 
-                        alt="" 
-                        className="h-full w-full object-cover" 
-                      />
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img 
+                          src={post.thumbnail_url && (post.thumbnail_url.includes('youtube.com') || post.thumbnail_url.includes('youtu.be'))
+                            ? `https://img.youtube.com/vi/${post.thumbnail_url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/)?.[2] || ''}/0.jpg`
+                            : post.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=600&q=80'} 
+                          alt="" 
+                          className="h-full w-full object-cover" 
+                        />
+                      </>
                     )}
                   </div>
                   <div>
@@ -205,13 +219,13 @@ export default function AdminDashboardPage() {
                       Public
                     </span>
                   ) : (
-                    <span className="text-[9px] font-bold text-slate-550 text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 uppercase tracking-wider">
+                      <span className="rounded border border-slate-200 bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">
                       Draft
                     </span>
                   )}
                   <Link
                     href={`/admin/posts/${post.id}/edit`}
-                    className="p-1.5 text-slate-500 hover:text-primary bg-slate-100 border border-slate-250 border-slate-200 rounded-lg transition-colors"
+                    className="rounded-lg border border-slate-200 bg-slate-100 p-1.5 text-slate-500 transition-colors hover:text-primary"
                   >
                     <IconEdit className="w-3.5 h-3.5" />
                   </Link>
@@ -221,6 +235,7 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 }

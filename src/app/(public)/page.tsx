@@ -7,6 +7,7 @@ import ProjectCard from '@/components/ProjectCard';
 import CategoryCard from '@/components/CategoryCard';
 import BlogCard from '@/components/BlogCard';
 import EmptyState from '@/components/EmptyState';
+import SectionLoading from '@/components/SectionLoading';
 import VideoEmbed from '@/components/VideoEmbed';
 import {
   IconArrowRight,
@@ -19,7 +20,7 @@ import {
 } from '@tabler/icons-react';
 
 export default function HomePage() {
-  const { projects, categories, posts, profile } = useSiteData();
+  const { projects, categories, posts, profile, projectsLoading, categoriesLoading, postsLoading, profileLoading } = useSiteData();
 
   // Video Popup State
   const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
@@ -78,6 +79,7 @@ export default function HomePage() {
           {/* Custom background assets based on Admin selections */}
           {profile?.hero_bg_type === 'image' && profile?.hero_bg_url ? (
             <div className="absolute inset-0 z-0 select-none pointer-events-none">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={profile.hero_bg_url} alt="" className="w-full h-full object-cover opacity-15" />
               <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/80 to-background" />
             </div>
@@ -141,7 +143,7 @@ export default function HomePage() {
       )}
 
       {/* 2. FEATURED PROJECTS SECTION */}
-      {profile?.show_featured !== false && (
+      {(profileLoading || profile?.show_featured !== false) && (
         <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div className="space-y-2">
@@ -159,7 +161,9 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {featuredProjects.length > 0 ? (
+          {projectsLoading || categoriesLoading ? (
+            <SectionLoading title="Đang tải dự án nổi bật..." lines={3} />
+          ) : featuredProjects.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredProjects.map((project) => {
                 const cat = categories.find((c) => c.id.toLowerCase() === project.category_id.toLowerCase());
@@ -186,7 +190,7 @@ export default function HomePage() {
       )}
 
       {/* 3. CATEGORIES SECTION */}
-      {profile?.show_categories !== false && (
+      {(profileLoading || profile?.show_categories !== false) && (
         <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
           <div className="space-y-2">
             <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
@@ -195,15 +199,19 @@ export default function HomePage() {
             <p className="text-sm text-slate-500 max-w-md">Các định dạng video Thảo Quyên thường xuyên hỗ trợ khách hàng biên tập và tối ưu hóa nội dung.</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {homeCategories.map((category) => (
-              <CategoryCard
-                key={category.id}
-                category={category}
-                projectCount={getProjectCount(category.id)}
-              />
-            ))}
-          </div>
+          {categoriesLoading || projectsLoading ? (
+            <SectionLoading title="Đang tải danh mục video..." lines={4} />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {homeCategories.map((category) => (
+                <CategoryCard
+                  key={category.id}
+                  category={category}
+                  projectCount={getProjectCount(category.id)}
+                />
+              ))}
+            </div>
+          )}
         </section>
       )}
 
@@ -223,7 +231,7 @@ export default function HomePage() {
                 </div>
                 <div className="space-y-2">
                   <h3 className="text-base font-bold text-slate-900">{step.title}</h3>
-                  <p className="text-sm text-slate-650 leading-relaxed text-slate-600">{step.desc}</p>
+                  <p className="text-sm leading-relaxed text-slate-600">{step.desc}</p>
                 </div>
               </div>
             ))}
@@ -232,7 +240,7 @@ export default function HomePage() {
       )}
 
       {/* 5. LATEST BLOGS */}
-      {profile?.show_blogs !== false && (
+      {(profileLoading || profile?.show_blogs !== false) && (
         <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div className="space-y-2">
@@ -250,7 +258,9 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {latestPosts.length > 0 ? (
+          {postsLoading ? (
+            <SectionLoading title="Đang tải bài viết mới nhất..." lines={3} />
+          ) : latestPosts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {latestPosts.map((post) => (
                 <BlogCard key={post.id} post={post} />

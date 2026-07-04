@@ -3,6 +3,7 @@
 import React, { use } from 'react';
 import Link from 'next/link';
 import { useSiteData } from '@/context/SiteDataContext';
+import SectionLoading from '@/components/SectionLoading';
 import {
   IconChevronLeft,
   IconCalendar,
@@ -17,9 +18,13 @@ interface PageProps {
 
 export default function BlogDetailPage({ params }: PageProps) {
   const resolvedParams = use(params);
-  const { posts, profile } = useSiteData();
+  const { posts, profile, postsLoading } = useSiteData();
 
   const post = posts.find((p) => p.slug.toLowerCase() === resolvedParams.slug.toLowerCase() && p.status === 'published');
+
+  if (postsLoading) {
+    return <div className="mx-auto max-w-5xl px-4 py-12"><SectionLoading title="Đang tải bài viết..." lines={4} /></div>;
+  }
 
   if (!post) {
     return (
@@ -176,13 +181,16 @@ export default function BlogDetailPage({ params }: PageProps) {
             className="h-full w-full object-cover"
           />
         ) : (
-          <img
-            src={post.thumbnail_url && (post.thumbnail_url.includes('youtube.com') || post.thumbnail_url.includes('youtu.be'))
-              ? `https://img.youtube.com/vi/${post.thumbnail_url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/)?.[2] || ''}/0.jpg`
-              : post.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80'}
-            alt={post.title}
-            className="h-full w-full object-cover"
-          />
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={post.thumbnail_url && (post.thumbnail_url.includes('youtube.com') || post.thumbnail_url.includes('youtu.be'))
+                ? `https://img.youtube.com/vi/${post.thumbnail_url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/)?.[2] || ''}/0.jpg`
+                : post.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80'}
+              alt={post.title}
+              className="h-full w-full object-cover"
+            />
+          </>
         )}
       </div>
 
