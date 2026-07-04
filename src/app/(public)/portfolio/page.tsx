@@ -5,7 +5,8 @@ import { useSiteData } from '@/context/SiteDataContext';
 import ProjectCard from '@/components/ProjectCard';
 import EmptyState from '@/components/EmptyState';
 import SectionLoading from '@/components/SectionLoading';
-import { IconSearch, IconAdjustmentsHorizontal } from '@tabler/icons-react';
+import VideoEmbed from '@/components/VideoEmbed';
+import { IconSearch, IconAdjustmentsHorizontal, IconX } from '@tabler/icons-react';
 
 export default function PortfolioPage() {
   const { projects, categories, projectsLoading, categoriesLoading } = useSiteData();
@@ -13,6 +14,8 @@ export default function PortfolioPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('newest'); // newest | featured
+  const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
+  const [activeVideoTitle, setActiveVideoTitle] = useState<string | null>(null);
 
   // Filter projects (only show published ones)
   const filteredProjects = projects
@@ -102,6 +105,10 @@ export default function PortfolioPage() {
                 key={project.id}
                 project={project}
                 categoryName={cat?.name}
+                onPlay={(url, title) => {
+                  setActiveVideoUrl(url);
+                  setActiveVideoTitle(title);
+                }}
               />
             );
           })}
@@ -111,6 +118,38 @@ export default function PortfolioPage() {
           title="Không tìm thấy video phù hợp"
           message="Vui lòng điều chỉnh từ khóa tìm kiếm hoặc đổi bộ lọc danh mục khác."
         />
+      )}
+
+      {activeVideoUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer transition-opacity duration-300"
+            onClick={() => {
+              setActiveVideoUrl(null);
+              setActiveVideoTitle(null);
+            }}
+          />
+
+          <div className="relative z-10 w-full max-w-[380px] bg-zinc-950 rounded-3xl overflow-hidden border border-white/10 shadow-2xl flex flex-col items-center animate-in fade-in zoom-in-95 duration-200">
+            <div className="w-full flex items-center justify-between px-5 py-3.5 bg-black/40 border-b border-white/5 text-white">
+              <h4 className="text-xs font-bold truncate pr-6 font-sans tracking-wide uppercase">{activeVideoTitle || 'Xem Video'}</h4>
+              <button
+                onClick={() => {
+                  setActiveVideoUrl(null);
+                  setActiveVideoTitle(null);
+                }}
+                className="p-1 rounded-lg text-gray-400 hover:text-white transition-colors hover:bg-white/5 cursor-pointer"
+                aria-label="Đóng"
+              >
+                <IconX className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="w-full aspect-[9/16] bg-black relative flex items-center justify-center max-h-[75vh] overflow-hidden">
+              <VideoEmbed videoUrl={activeVideoUrl} title={activeVideoTitle || 'Project Video'} isVertical={true} />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

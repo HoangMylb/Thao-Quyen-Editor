@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="../build/ThaoQuyenEditor.Api.props" />
-</Project>

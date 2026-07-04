@@ -87,9 +87,31 @@ function SettingsForm({ profile, projects, categories, updateProfile }: Settings
     setHeroVideoProjectId('');
   };
 
+  const handleHomepageFeaturedProjectChange = (slotIndex: number, value: string) => {
+    const normalizedValue = value.toLowerCase();
+    const updated = [...homepageFeaturedProjectIds];
+    updated[slotIndex] = normalizedValue;
+
+    const normalizedItems = updated.map((item, index, all) => (item && all.indexOf(item) !== index ? '' : item));
+    const selectedCount = normalizedItems.filter(Boolean).length;
+
+    if (selectedCount > 3) {
+      alert('Chỉ được chọn tối đa 3 dự án nổi bật cho trang chủ.');
+      return;
+    }
+
+    setHomepageFeaturedProjectIds(normalizedItems);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !email) return;
+
+    const normalizedHomepageFeaturedProjectIds = Array.from(new Set(homepageFeaturedProjectIds.filter(Boolean)));
+    if (normalizedHomepageFeaturedProjectIds.length > 3) {
+      alert('Chỉ được chọn tối đa 3 dự án nổi bật cho trang chủ.');
+      return;
+    }
 
     let resolvedHeroBgUrl = heroBgUrl;
 
@@ -132,7 +154,7 @@ function SettingsForm({ profile, projects, categories, updateProfile }: Settings
       hero_bg_type: heroBgType,
       hero_bg_url: resolvedHeroBgUrl,
       hero_video_project_id: heroVideoProjectId.toLowerCase(),
-      homepage_featured_project_ids: Array.from(new Set(homepageFeaturedProjectIds.filter(Boolean))),
+      homepage_featured_project_ids: normalizedHomepageFeaturedProjectIds,
       homepage_category_ids: Array.from(new Set(homepageCategoryIds))
     };
 
@@ -308,7 +330,7 @@ function SettingsForm({ profile, projects, categories, updateProfile }: Settings
               {[0, 1, 2].map((slotIndex) => (
                 <div key={slotIndex} className="space-y-1.5">
                   <label className="text-xs font-semibold text-slate-600">Video ở vị trí {slotIndex + 1}</label>
-                  <select value={homepageFeaturedProjectIds[slotIndex] || ''} onChange={(e) => { const updated = [...homepageFeaturedProjectIds]; updated[slotIndex] = e.target.value.toLowerCase(); setHomepageFeaturedProjectIds(updated.map((value, index, all) => (value && all.indexOf(value) !== index ? '' : value))); }} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 focus:border-primary/50 focus:outline-none focus:bg-white transition-all">
+                  <select value={homepageFeaturedProjectIds[slotIndex] || ''} onChange={(e) => handleHomepageFeaturedProjectChange(slotIndex, e.target.value)} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 focus:border-primary/50 focus:outline-none focus:bg-white transition-all">
                     <option value="">-- Trống --</option>
                     {projects.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
                   </select>

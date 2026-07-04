@@ -17,6 +17,7 @@ export default function AdminProjectsPage() {
   const { projects, categories, deleteProject, updateProject, projectsLoading, categoriesLoading } = useSiteData();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const featuredProjectsCount = projects.filter((project) => project.is_featured).length;
 
   const handleDelete = async (id: string, title: string) => {
     if (confirm(`Bạn có chắc chắn muốn xóa dự án "${title}" không?`)) {
@@ -25,6 +26,11 @@ export default function AdminProjectsPage() {
   };
 
   const toggleFeatured = async (id: string, currentVal: boolean) => {
+    if (!currentVal && featuredProjectsCount >= 3) {
+      alert('Chỉ được chọn tối đa 3 dự án nổi bật. Hãy bỏ bớt một dự án nổi bật trước khi thêm mới.');
+      return;
+    }
+
     await updateProject(id, { is_featured: !currentVal });
   };
 

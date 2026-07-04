@@ -26,11 +26,16 @@ export default function HomePage() {
   const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
   const [activeVideoTitle, setActiveVideoTitle] = useState<string | null>(null);
 
-  // Get Featured Projects based on Admin settings, fall back to first 3 is_featured projects
   const featuredIds = Array.from(new Set((profile?.homepage_featured_project_ids || []).map((id) => id.toLowerCase())));
-  const featuredProjects = featuredIds.length > 0
-    ? (featuredIds.map(id => projects.find(p => p.id.toLowerCase() === id)).filter(Boolean) as typeof projects).filter(p => p.is_published)
-    : projects.filter((p) => p.is_featured && p.is_published).slice(0, 3);
+  const configuredFeaturedProjects = (featuredIds.map(id => projects.find(p => p.id.toLowerCase() === id)).filter(Boolean) as typeof projects)
+    .filter((p) => p.is_published);
+  const autoFeaturedProjects = projects.filter((p) => p.is_featured && p.is_published);
+  const featuredProjects = Array.from(
+    new Map(
+      [...configuredFeaturedProjects, ...autoFeaturedProjects]
+        .map((project) => [project.id.toLowerCase(), project])
+    ).values()
+  ).slice(0, 3);
 
   // Get categories configured by Admin
   const homeCategoryIds = Array.from(new Set((profile?.homepage_category_ids || []).map((id) => id.toLowerCase())));
