@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using ThaoQuyenEditor.Api.Config;
 using ThaoQuyenEditor.Api.Data;
 using ThaoQuyenEditor.Api.Services;
 
@@ -19,7 +20,8 @@ if (!string.IsNullOrWhiteSpace(port))
     builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 // ── AutoMapper ───────────────────────────────────────────
-builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddAutoMapper(_ => { }, typeof(Program));
+builder.Services.Configure<SupabaseOptions>(builder.Configuration.GetSection(SupabaseOptions.SectionName));
 
 // ── Services (DI) ────────────────────────────────────────
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -29,6 +31,7 @@ builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddHttpClient<IFileStorageService, FileStorageService>();
 
 // ── JWT Authentication ───────────────────────────────────
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -84,8 +87,11 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 // ── Seed Data ────────────────────────────────────────────
 await SeedData.Initialize(app.Services);
@@ -99,12 +105,20 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ── Health Check ─────────────────────────────────────────
-app.MapGet("/api/health", () => Results.Ok(new
+app.MapGet("/api/health", async (IFileStorageService fileStorageService, CancellationToken cancellationToken) =>
 {
-    Status = "Healthy",
-    Timestamp = DateTime.UtcNow
-})).AllowAnonymous();
+    var storage = await fileStorageService.GetHealthAsync(cancellationToken);
+    return Results.Ok(new
+    {
+        Status = "Healthy",
+        Timestamp = DateTime.UtcNow,
+        Storage = storage
+    });
+}).AllowAnonymous();
 
-app.MapGet("/swager", () => Results.Redirect("/swagger")).AllowAnonymous();
+if (app.Environment.IsDevelopment())
+{
+    app.MapGet("/swager", () => Results.Redirect("/swagger")).AllowAnonymous();
+}
 
 app.Run();
