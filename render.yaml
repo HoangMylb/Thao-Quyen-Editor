@@ -16,3 +16,9 @@ services:
         value: ThaoQuyenEditor
       - key: JwtSettings__Audience
         value: ThaoQuyenEditorClient
+      - key: Supabase__Url
+        sync: false
+      - key: Supabase__ServiceRoleKey
+        sync: false
+      - key: Supabase__StorageBucket
+        value: videos

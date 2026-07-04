@@ -1,8 +1,12 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This project contains:
+
+- Next.js frontend in `src/`
+- .NET backend API in `backend/`
+- Render deployment config in `render.yaml`
 
 ## Getting Started
 
-First, run the development server:
+First, install frontend dependencies and run the development server:
 
 ```bash
 npm run dev
@@ -14,23 +18,55 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the frontend.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To run backend locally:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cd backend
+dotnet run
+```
 
-## Learn More
+Backend health check:
 
-To learn more about Next.js, take a look at the following resources:
+```text
+http://localhost:5000/api/health
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+You can start editing the frontend by modifying files under `src/app/`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to load local Montserrat variable fonts.
 
-## Deploy on Vercel
+## Environment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Frontend:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+NEXT_PUBLIC_API_BASE_URL=http://localhost:5000
+```
+
+Backend:
+
+```bash
+ConnectionStrings__DefaultConnection=Host=localhost;Port=5432;Database=thaoquyen;Username=postgres;Password=postgres;SSL Mode=Disable
+ASPNETCORE_ENVIRONMENT=Development
+JwtSettings__SecretKey=REPLACE_WITH_A_RANDOM_SECRET_AT_LEAST_32_CHARS
+JwtSettings__Issuer=ThaoQuyenEditor
+JwtSettings__Audience=ThaoQuyenEditorClient
+Supabase__Url=https://YOUR_PROJECT_REF.supabase.co
+Supabase__ServiceRoleKey=YOUR_SUPABASE_SERVICE_ROLE_KEY
+Supabase__StorageBucket=videos
+```
+
+## Deploy
+
+- Frontend: Vercel
+- Backend API: Render via `render.yaml`
+- Database: PostgreSQL / Supabase connection string via backend env vars
+- Storage: Supabase Storage bucket `videos` must be public for returned URLs to work
+
+Health check:
+
+- `GET /api/health` now includes `Storage` section
+- If `Storage.Configured=false`: missing `Supabase__Url`, `Supabase__ServiceRoleKey`, or `Supabase__StorageBucket`
+- If `Storage.BucketPublicUrlReachable=false`: bucket may not exist yet or is not public
