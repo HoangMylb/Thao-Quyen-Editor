@@ -169,11 +169,11 @@ export default function ProjectForm({ project }: ProjectFormProps) {
 
           {/* Video URL & Direct Upload */}
           <div className="space-y-1.5 md:col-span-2">
-            <label className="text-xs font-semibold text-slate-600">Video Dự án (Định dạng dọc 9:16 - URL hoặc Tải video lên) *</label>
+            <label className="text-xs font-semibold text-slate-600">Video Dự án (dán URL hoặc chọn file từ máy) *</label>
             <div className="flex gap-2">
                 <input
                   type="text"
-                  required
+                  required={!videoFile}
                   value={videoUrl}
                   onChange={(e) => {
                     setVideoUrl(e.target.value);
@@ -184,7 +184,15 @@ export default function ProjectForm({ project }: ProjectFormProps) {
                       setLocalVideoPreviewUrl('');
                     }
                   }}
-                  placeholder="https://www.youtube.com/watch?v=... hoặc dữ liệu file video"
+                  onInvalid={(e) => {
+                    if (!videoFile) {
+                      e.currentTarget.setCustomValidity('Hãy nhập URL video hoặc chọn file video để tải lên.');
+                    } else {
+                      e.currentTarget.setCustomValidity('');
+                    }
+                  }}
+                  onInput={(e) => e.currentTarget.setCustomValidity('')}
+                  placeholder="Dán link video public hoặc để trống nếu bạn chọn file từ máy"
                   className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-primary/50 focus:outline-none focus:bg-white transition-all"
                 />
               <label className="inline-flex items-center justify-center rounded-xl border border-slate-200 hover:border-primary/50 hover:bg-slate-50 px-4 text-xs font-semibold text-slate-700 cursor-pointer transition-colors">
@@ -212,7 +220,7 @@ export default function ProjectForm({ project }: ProjectFormProps) {
             </div>
             {localVideoName && (
               <p className="text-[11px] text-amber-700">
-                Đã chọn file: {localVideoName}. Sẽ upload khi bấm lưu.
+                Đã chọn file từ máy: {localVideoName}. Không cần nhập thêm link. File sẽ được upload khi bấm lưu.
               </p>
             )}
             {videoUrl && (
