@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSiteData } from '@/context/SiteDataContext';
+import { uploadVideo } from '@/lib/api';
 import { IconSettings, IconCheck, IconUser } from '@tabler/icons-react';
 
 export default function AdminSettingsPage() {
@@ -12,7 +13,7 @@ export default function AdminSettingsPage() {
   const [shortBio, setShortBio] = useState(profile?.short_bio || '');
   const [aboutContent, setAboutContent] = useState(profile?.about_content || '');
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || '');
-  const [email, setEmail] = useState(profile?.email || '');
+  const email = profile?.email || '';
   const [phone, setPhone] = useState(profile?.phone || '');
   const [zaloUrl, setZaloUrl] = useState(profile?.zalo_url || '');
   const [facebookUrl, setFacebookUrl] = useState(profile?.facebook_url || '');
@@ -35,6 +36,10 @@ export default function AdminSettingsPage() {
 
   const [heroBgType, setHeroBgType] = useState<'color' | 'image' | 'video'>(profile?.hero_bg_type || 'color');
   const [heroBgUrl, setHeroBgUrl] = useState(profile?.hero_bg_url || '');
+  const [localHeroVideoPreviewUrl, setLocalHeroVideoPreviewUrl] = useState('');
+  const [localHeroVideoName, setLocalHeroVideoName] = useState('');
+  const [heroVideoFile, setHeroVideoFile] = useState<File | null>(null);
+  const [isUploadingHeroVideo, setIsUploadingHeroVideo] = useState(false);
   const [heroVideoProjectId, setHeroVideoProjectId] = useState((profile?.hero_video_project_id || '').toLowerCase());
   const [homepageFeaturedProjectIds, setHomepageFeaturedProjectIds] = useState<string[]>(
     Array.from(new Set((profile?.homepage_featured_project_ids || []).map((id) => id.toLowerCase())))
@@ -42,6 +47,12 @@ export default function AdminSettingsPage() {
   const [homepageCategoryIds, setHomepageCategoryIds] = useState<string[]>(
     Array.from(new Set((profile?.homepage_category_ids || []).map((id) => id.toLowerCase())))
   );
+
+  useEffect(() => () => {
+    if (localHeroVideoPreviewUrl) {
+      URL.revokeObjectURL(localHeroVideoPreviewUrl);
+    }
+  }, [localHeroVideoPreviewUrl]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, setUrl: (url: string) => void) => {
     const file = e.target.files?.[0];
@@ -55,9 +66,38 @@ export default function AdminSettingsPage() {
     reader.readAsDataURL(file);
   };
 
+  const handleHeroVideoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (localHeroVideoPreviewUrl) {
+      URL.revokeObjectURL(localHeroVideoPreviewUrl);
+    }
+
+    const nextPreviewUrl = URL.createObjectURL(file);
+    setLocalHeroVideoPreviewUrl(nextPreviewUrl);
+    setLocalHeroVideoName(file.name);
+    setHeroVideoFile(file);
+    setHeroBgUrl('');
+    setHeroVideoProjectId('');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !email) return;
+
+    let resolvedHeroBgUrl = heroBgUrl;
+
+    if (heroBgType === 'video' && heroVideoFile) {
+      setIsUploadingHeroVideo(true);
+      try {
+        const uploaded = await uploadVideo(heroVideoFile, 'hero');
+        resolvedHeroBgUrl = uploaded.url;
+        setHeroBgUrl(uploaded.url);
+      } finally {
+        setIsUploadingHeroVideo(false);
+      }
+    }
 
     const newProfile = {
       ...profile,
@@ -85,7 +125,7 @@ export default function AdminSettingsPage() {
       categories_title: categoriesTitle,
       blogs_title: blogsTitle,
       hero_bg_type: heroBgType,
-      hero_bg_url: heroBgUrl,
+      hero_bg_url: resolvedHeroBgUrl,
       hero_video_project_id: heroVideoProjectId.toLowerCase(),
       homepage_featured_project_ids: Array.from(new Set(homepageFeaturedProjectIds.filter(Boolean))),
       homepage_category_ids: Array.from(new Set(homepageCategoryIds))
@@ -101,7 +141,7 @@ export default function AdminSettingsPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Cấu hình Profile & Site Settings</h1>
-        <p className="text-xs text-slate-505 text-slate-500">Quản lý thông tin hiển thị cá nhân, các social link và nội dung giới thiệu.</p>
+        <p className="text-xs text-slate-500">Quản lý thông tin hiển thị cá nhân, các social link và nội dung giới thiệu.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -157,7 +197,8 @@ export default function AdminSettingsPage() {
               </div>
               {avatarUrl && (
                 <div className="mt-2 flex items-center gap-2">
-                  <span className="text-[10px] text-slate-450 text-slate-400">Xem trước:</span>
+                  <span className="text-[10px] text-slate-400">Xem trước:</span>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={avatarUrl} alt="Avatar Preview" className="h-10 w-10 object-cover rounded-full border border-slate-200" />
                 </div>
               )}
@@ -323,7 +364,7 @@ export default function AdminSettingsPage() {
                   type="checkbox"
                   checked={showHero}
                   onChange={(e) => setShowHero(e.target.checked)}
-                  className="h-4 w-4 rounded border-slate-350 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                      className="h-4 w-4 cursor-pointer rounded border-slate-300 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0"
                 />
                 Hiện phần Hero (Banner chính)
               </label>
@@ -333,7 +374,7 @@ export default function AdminSettingsPage() {
                   type="checkbox"
                   checked={showFeatured}
                   onChange={(e) => setShowFeatured(e.target.checked)}
-                  className="h-4 w-4 rounded border-slate-350 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                      className="h-4 w-4 cursor-pointer rounded border-slate-300 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0"
                 />
                 Hiện phần Dự án nổi bật
               </label>
@@ -343,7 +384,7 @@ export default function AdminSettingsPage() {
                   type="checkbox"
                   checked={showCategories}
                   onChange={(e) => setShowCategories(e.target.checked)}
-                  className="h-4 w-4 rounded border-slate-350 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                      className="h-4 w-4 cursor-pointer rounded border-slate-300 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0"
                 />
                 Hiện phần Danh mục video
               </label>
@@ -353,7 +394,7 @@ export default function AdminSettingsPage() {
                   type="checkbox"
                   checked={showWorkflow}
                   onChange={(e) => setShowWorkflow(e.target.checked)}
-                  className="h-4 w-4 rounded border-slate-350 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                      className="h-4 w-4 cursor-pointer rounded border-slate-300 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0"
                 />
                 Hiện phần Quy trình làm việc
               </label>
@@ -363,7 +404,7 @@ export default function AdminSettingsPage() {
                   type="checkbox"
                   checked={showStats}
                   onChange={(e) => setShowStats(e.target.checked)}
-                  className="h-4 w-4 rounded border-slate-350 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                      className="h-4 w-4 cursor-pointer rounded border-slate-300 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0"
                 />
                 Hiện phần Chỉ số (Thống kê)
               </label>
@@ -373,7 +414,7 @@ export default function AdminSettingsPage() {
                   type="checkbox"
                   checked={showBlogs}
                   onChange={(e) => setShowBlogs(e.target.checked)}
-                  className="h-4 w-4 rounded border-slate-350 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                      className="h-4 w-4 cursor-pointer rounded border-slate-300 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0"
                 />
                 Hiện phần Blog chia sẻ
               </label>
@@ -383,7 +424,7 @@ export default function AdminSettingsPage() {
                   type="checkbox"
                   checked={showContact}
                   onChange={(e) => setShowContact(e.target.checked)}
-                  className="h-4 w-4 rounded border-slate-350 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                      className="h-4 w-4 cursor-pointer rounded border-slate-300 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0"
                 />
                 Hiện phần Banner liên hệ
               </label>
@@ -491,6 +532,7 @@ export default function AdminSettingsPage() {
                   </div>
                   {heroBgUrl && (
                     <div className="mt-2 relative h-20 w-40 rounded-lg overflow-hidden border border-slate-200">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={heroBgUrl} alt="Hero Background Preview" className="h-full w-full object-cover" />
                     </div>
                   )}
@@ -504,11 +546,19 @@ export default function AdminSettingsPage() {
                     <label className="text-xs font-semibold text-slate-600">Hoặc chọn video từ Danh sách Dự án sẵn có</label>
                     <select
                       value={heroVideoProjectId}
-                      onChange={(e) => {
-                        setHeroVideoProjectId(e.target.value.toLowerCase());
-                        const proj = projects.find(p => p.id.toLowerCase() === e.target.value.toLowerCase());
-                        if (proj?.video_url) setHeroBgUrl(proj.video_url);
-                      }}
+                        onChange={(e) => {
+                          setHeroVideoProjectId(e.target.value.toLowerCase());
+                          const proj = projects.find(p => p.id.toLowerCase() === e.target.value.toLowerCase());
+                          if (proj?.video_url) {
+                            if (localHeroVideoPreviewUrl) {
+                              URL.revokeObjectURL(localHeroVideoPreviewUrl);
+                            }
+                            setLocalHeroVideoPreviewUrl('');
+                            setLocalHeroVideoName('');
+                            setHeroVideoFile(null);
+                            setHeroBgUrl(proj.video_url);
+                          }
+                        }}
                       className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 focus:border-primary/50 focus:outline-none focus:bg-white transition-all"
                     >
                       <option value="">-- Chọn một dự án video --</option>
@@ -524,7 +574,15 @@ export default function AdminSettingsPage() {
                       <input
                         type="text"
                         value={heroBgUrl}
-                        onChange={(e) => setHeroBgUrl(e.target.value)}
+                        onChange={(e) => {
+                          setHeroBgUrl(e.target.value);
+                          setHeroVideoFile(null);
+                          setLocalHeroVideoName('');
+                          if (localHeroVideoPreviewUrl) {
+                            URL.revokeObjectURL(localHeroVideoPreviewUrl);
+                            setLocalHeroVideoPreviewUrl('');
+                          }
+                        }}
                         placeholder="https://example.com/video.mp4 hoặc link YouTube/Vimeo"
                         className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 focus:border-primary/50 focus:outline-none focus:bg-white transition-all"
                       />
@@ -534,10 +592,18 @@ export default function AdminSettingsPage() {
                           type="file"
                           accept="video/*"
                           className="hidden"
-                          onChange={(e) => handleFileChange(e, setHeroBgUrl)}
+                          onChange={handleHeroVideoFileChange}
                         />
                       </label>
                     </div>
+                    {localHeroVideoName && (
+                      <div className="space-y-2">
+                        <p className="text-[11px] text-amber-700">
+                          Đã chọn file: {localHeroVideoName}. Sẽ upload khi bấm lưu.
+                        </p>
+                        <video src={localHeroVideoPreviewUrl} autoPlay muted loop playsInline controls className="h-20 w-40 rounded-lg border border-slate-200 object-cover" />
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -590,7 +656,7 @@ export default function AdminSettingsPage() {
                             setHomepageCategoryIds(homepageCategoryIds.filter(id => id !== normalizedId));
                           }
                         }}
-                        className="h-4 w-4 rounded border-slate-350 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                      className="h-4 w-4 cursor-pointer rounded border-slate-300 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0"
                       />
                       {cat.name}
                     </label>
@@ -605,9 +671,10 @@ export default function AdminSettingsPage() {
         <div className="flex justify-end gap-3">
           <button
             type="submit"
+            disabled={isUploadingHeroVideo}
             className="rounded-xl bg-primary px-8 py-3 text-xs font-semibold text-white hover:bg-emerald-500 hover:shadow-lg active:scale-[0.98] transition-all"
           >
-            Lưu tất cả cấu hình
+            {isUploadingHeroVideo ? 'Đang upload video...' : 'Lưu tất cả cấu hình'}
           </button>
         </div>
       </form>
