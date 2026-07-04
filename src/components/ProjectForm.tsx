@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSiteData } from '@/context/SiteDataContext';
+import { uploadVideo } from '@/lib/api';
 import { Project } from '@/lib/types';
 import { generateSlug } from '@/lib/slugify';
 import { IconChevronLeft, IconVideo } from '@tabler/icons-react';
@@ -19,8 +20,12 @@ export default function ProjectForm({ project }: ProjectFormProps) {
   const [slug, setSlug] = useState(project?.slug || '');
   const [shortDescription, setShortDescription] = useState(project?.short_description || '');
   const [description, setDescription] = useState(project?.description || '');
-  const [thumbnailUrl, setThumbnailUrl] = useState(project?.thumbnail_url || '');
+  const thumbnailUrl = project?.thumbnail_url || '';
   const [videoUrl, setVideoUrl] = useState(project?.video_url || '');
+  const [localVideoPreviewUrl, setLocalVideoPreviewUrl] = useState('');
+  const [localVideoName, setLocalVideoName] = useState('');
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [isUploadingVideo, setIsUploadingVideo] = useState(false);
   const [categoryId, setCategoryId] = useState(project?.category_id || categories[0]?.id || '');
   const [clientName, setClientName] = useState(project?.client_name || '');
   const [toolsInput, setToolsInput] = useState(project?.tools_used?.join(', ') || '');
@@ -28,6 +33,12 @@ export default function ProjectForm({ project }: ProjectFormProps) {
   const [editorRole, setEditorRole] = useState(project?.editor_role || '');
   const [isFeatured, setIsFeatured] = useState(project?.is_featured || false);
   const [projectDate, setProjectDate] = useState(project?.project_date || new Date().toISOString().split('T')[0]);
+
+  useEffect(() => () => {
+    if (localVideoPreviewUrl) {
+      URL.revokeObjectURL(localVideoPreviewUrl);
+    }
+  }, [localVideoPreviewUrl]);
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
@@ -37,6 +48,21 @@ export default function ProjectForm({ project }: ProjectFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !slug || !categoryId) return;
+
+    let resolvedVideoUrl = videoUrl.trim();
+
+    if (videoFile) {
+      setIsUploadingVideo(true);
+      try {
+        const uploaded = await uploadVideo(videoFile, 'projects');
+        resolvedVideoUrl = uploaded.url;
+        setVideoUrl(uploaded.url);
+      } finally {
+        setIsUploadingVideo(false);
+      }
+    }
+
+    if (!resolvedVideoUrl) return;
 
     // Parse toolsInput from comma separated to array
     const tools_used = toolsInput
@@ -49,8 +75,8 @@ export default function ProjectForm({ project }: ProjectFormProps) {
       slug,
       short_description: shortDescription,
       description,
-      thumbnail_url: thumbnailUrl,
-      video_url: videoUrl,
+      thumbnail_url: thumbnailUrl || resolvedVideoUrl,
+      video_url: resolvedVideoUrl,
       category_id: categoryId,
       client_name: clientName,
       tools_used,
@@ -145,14 +171,22 @@ export default function ProjectForm({ project }: ProjectFormProps) {
           <div className="space-y-1.5 md:col-span-2">
             <label className="text-xs font-semibold text-slate-600">Video Dự án (Định dạng dọc 9:16 - URL hoặc Tải video lên) *</label>
             <div className="flex gap-2">
-              <input
-                type="text"
-                required
-                value={videoUrl}
-                onChange={(e) => setVideoUrl(e.target.value)}
-                placeholder="https://www.youtube.com/watch?v=... hoặc dữ liệu file video"
-                className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-primary/50 focus:outline-none focus:bg-white transition-all"
-              />
+                <input
+                  type="text"
+                  required
+                  value={videoUrl}
+                  onChange={(e) => {
+                    setVideoUrl(e.target.value);
+                    setVideoFile(null);
+                    setLocalVideoName('');
+                    if (localVideoPreviewUrl) {
+                      URL.revokeObjectURL(localVideoPreviewUrl);
+                      setLocalVideoPreviewUrl('');
+                    }
+                  }}
+                  placeholder="https://www.youtube.com/watch?v=... hoặc dữ liệu file video"
+                  className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-primary/50 focus:outline-none focus:bg-white transition-all"
+                />
               <label className="inline-flex items-center justify-center rounded-xl border border-slate-200 hover:border-primary/50 hover:bg-slate-50 px-4 text-xs font-semibold text-slate-700 cursor-pointer transition-colors">
                 Tải video lên
                 <input
@@ -162,18 +196,25 @@ export default function ProjectForm({ project }: ProjectFormProps) {
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                      if (event.target?.result) {
-                        setVideoUrl(event.target.result as string);
-                        setThumbnailUrl(event.target.result as string);
-                      }
-                    };
-                    reader.readAsDataURL(file);
+
+                    if (localVideoPreviewUrl) {
+                      URL.revokeObjectURL(localVideoPreviewUrl);
+                    }
+
+                    const nextPreviewUrl = URL.createObjectURL(file);
+                    setLocalVideoPreviewUrl(nextPreviewUrl);
+                    setLocalVideoName(file.name);
+                    setVideoFile(file);
+                    setVideoUrl('');
                   }}
                 />
               </label>
             </div>
+            {localVideoName && (
+              <p className="text-[11px] text-amber-700">
+                Đã chọn file: {localVideoName}. Sẽ upload khi bấm lưu.
+              </p>
+            )}
             {videoUrl && (
               <div className="mt-2 p-3 bg-slate-50 rounded-xl border border-slate-200 max-w-xs">
                 <span className="text-[10px] font-semibold text-slate-400 block mb-1">Xem trước video:</span>
@@ -186,6 +227,12 @@ export default function ProjectForm({ project }: ProjectFormProps) {
                 ) : (
                   <video src={videoUrl} controls className="w-full aspect-[9/16] rounded-lg border border-slate-200 object-cover" />
                 )}
+              </div>
+            )}
+            {!videoUrl && localVideoPreviewUrl && (
+              <div className="mt-2 p-3 bg-slate-50 rounded-xl border border-slate-200 max-w-xs">
+                <span className="text-[10px] font-semibold text-slate-400 block mb-1">Xem trước video từ máy:</span>
+                <video src={localVideoPreviewUrl} controls className="w-full aspect-[9/16] rounded-lg border border-slate-200 object-cover" />
               </div>
             )}
           </div>
@@ -273,7 +320,7 @@ export default function ProjectForm({ project }: ProjectFormProps) {
               type="checkbox"
               checked={isFeatured}
               onChange={(e) => setIsFeatured(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-350 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+              className="h-4 w-4 cursor-pointer rounded border-slate-300 bg-slate-50 text-emerald-600 focus:ring-0 focus:ring-offset-0"
             />
             Dự án nổi bật (Featured)
           </label>
@@ -284,15 +331,16 @@ export default function ProjectForm({ project }: ProjectFormProps) {
           <button
             type="button"
             onClick={() => router.push('/admin/projects')}
-            className="rounded-xl border border-slate-205 border-slate-200 bg-slate-100 px-6 py-2.5 text-xs font-semibold text-slate-800 hover:bg-slate-200 transition-all"
+            className="rounded-xl border border-slate-200 bg-slate-100 px-6 py-2.5 text-xs font-semibold text-slate-800 transition-all hover:bg-slate-200"
           >
             Hủy bỏ
           </button>
           <button
             type="submit"
+            disabled={isUploadingVideo}
             className="rounded-xl bg-primary px-6 py-2.5 text-xs font-semibold text-white hover:bg-emerald-500 transition-all shadow-sm"
           >
-            Lưu thay đổi
+            {isUploadingVideo ? 'Đang upload video...' : 'Lưu thay đổi'}
           </button>
         </div>
       </div>

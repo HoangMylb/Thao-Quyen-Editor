@@ -15,6 +15,13 @@ interface LoginPayload {
   message: string;
 }
 
+type UploadFileResponse = {
+  url: string;
+  fileName: string;
+  contentType: string;
+  size: number;
+};
+
 type ApiProfile = {
   id: string;
   fullName: string;
@@ -235,6 +242,26 @@ export function logout() {
 
 export function isLoggedIn() {
   return Boolean(getToken());
+}
+
+export async function uploadVideo(file: File, folder: 'projects' | 'posts' | 'hero') {
+  const token = getToken();
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('folder', folder);
+
+  const response = await fetch(`${API_BASE_URL}/api/uploads/video`, {
+    method: 'POST',
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    body: formData,
+  });
+
+  const body = (await response.json()) as ApiResponse<UploadFileResponse>;
+  if (!response.ok || !body.success || !body.data?.url) {
+    throw new Error(body.message || 'Upload video thất bại.');
+  }
+
+  return body.data;
 }
 
 export async function getProfile() {

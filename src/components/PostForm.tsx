@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSiteData } from '@/context/SiteDataContext';
+import { uploadVideo } from '@/lib/api';
 import { Post } from '@/lib/types';
 import { generateSlug } from '@/lib/slugify';
 import { IconChevronLeft, IconArticle } from '@tabler/icons-react';
@@ -20,7 +21,17 @@ export default function PostForm({ post }: PostFormProps) {
   const [excerpt, setExcerpt] = useState(post?.excerpt || '');
   const [content, setContent] = useState(post?.content || '');
   const [thumbnailUrl, setThumbnailUrl] = useState(post?.thumbnail_url || '');
+  const [localVideoPreviewUrl, setLocalVideoPreviewUrl] = useState('');
+  const [localVideoName, setLocalVideoName] = useState('');
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [isUploadingVideo, setIsUploadingVideo] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => () => {
+    if (localVideoPreviewUrl) {
+      URL.revokeObjectURL(localVideoPreviewUrl);
+    }
+  }, [localVideoPreviewUrl]);
 
   const insertFormat = (prefix: string, suffix: string = '') => {
     const textarea = textareaRef.current;
@@ -52,12 +63,27 @@ export default function PostForm({ post }: PostFormProps) {
     e.preventDefault();
     if (!title || !slug) return;
 
+    let resolvedThumbnailUrl = thumbnailUrl.trim();
+
+    if (videoFile) {
+      setIsUploadingVideo(true);
+      try {
+        const uploaded = await uploadVideo(videoFile, 'posts');
+        resolvedThumbnailUrl = uploaded.url;
+        setThumbnailUrl(uploaded.url);
+      } finally {
+        setIsUploadingVideo(false);
+      }
+    }
+
+    if (!resolvedThumbnailUrl) return;
+
     const postData = {
       title,
       slug,
       excerpt,
       content,
-      thumbnail_url: thumbnailUrl,
+      thumbnail_url: resolvedThumbnailUrl,
       status: 'published' as 'draft' | 'published',
       published_at: post?.published_at || new Date().toISOString()
     };
@@ -117,14 +143,22 @@ export default function PostForm({ post }: PostFormProps) {
           <div className="space-y-1.5 md:col-span-2">
             <label className="text-xs font-semibold text-slate-600">Video / Cover Clip cho bài viết (URL hoặc Tải video lên) *</label>
             <div className="flex gap-2">
-              <input
-                type="text"
-                required
-                value={thumbnailUrl}
-                onChange={(e) => setThumbnailUrl(e.target.value)}
-                placeholder="https://example.com/video.mp4 hoặc YouTube URL hoặc Dữ liệu file video"
-                className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-primary/50 focus:outline-none focus:bg-white transition-all"
-              />
+                <input
+                  type="text"
+                  required
+                  value={thumbnailUrl}
+                  onChange={(e) => {
+                    setThumbnailUrl(e.target.value);
+                    setVideoFile(null);
+                    setLocalVideoName('');
+                    if (localVideoPreviewUrl) {
+                      URL.revokeObjectURL(localVideoPreviewUrl);
+                      setLocalVideoPreviewUrl('');
+                    }
+                  }}
+                  placeholder="https://example.com/video.mp4 hoặc YouTube URL hoặc Dữ liệu file video"
+                  className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-primary/50 focus:outline-none focus:bg-white transition-all"
+                />
               <label className="inline-flex items-center justify-center rounded-xl border border-slate-200 hover:border-primary/50 hover:bg-slate-50 px-4 text-xs font-semibold text-slate-700 cursor-pointer transition-colors">
                 Tải video lên
                 <input
@@ -134,17 +168,25 @@ export default function PostForm({ post }: PostFormProps) {
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                      if (event.target?.result) {
-                        setThumbnailUrl(event.target.result as string);
-                      }
-                    };
-                    reader.readAsDataURL(file);
+
+                    if (localVideoPreviewUrl) {
+                      URL.revokeObjectURL(localVideoPreviewUrl);
+                    }
+
+                    const nextPreviewUrl = URL.createObjectURL(file);
+                    setLocalVideoPreviewUrl(nextPreviewUrl);
+                    setLocalVideoName(file.name);
+                    setVideoFile(file);
+                    setThumbnailUrl('');
                   }}
                 />
               </label>
             </div>
+            {localVideoName && (
+              <p className="text-[11px] text-amber-700">
+                Đã chọn file: {localVideoName}. Sẽ upload khi bấm lưu.
+              </p>
+            )}
             {thumbnailUrl && (
               <div className="mt-2 p-3 bg-slate-50 rounded-xl border border-slate-200 max-w-xs">
                 <span className="text-[10px] font-semibold text-slate-400 block mb-1">Xem trước video cover:</span>
@@ -157,6 +199,12 @@ export default function PostForm({ post }: PostFormProps) {
                 ) : (
                   <video src={thumbnailUrl} controls className="w-full aspect-video rounded-lg border border-slate-200 object-cover" />
                 )}
+              </div>
+            )}
+            {!thumbnailUrl && localVideoPreviewUrl && (
+              <div className="mt-2 p-3 bg-slate-50 rounded-xl border border-slate-200 max-w-xs">
+                <span className="text-[10px] font-semibold text-slate-400 block mb-1">Xem trước video cover từ máy:</span>
+                <video src={localVideoPreviewUrl} controls className="w-full aspect-video rounded-lg border border-slate-200 object-cover" />
               </div>
             )}
           </div>
@@ -251,15 +299,16 @@ export default function PostForm({ post }: PostFormProps) {
           <button
             type="button"
             onClick={() => router.push('/admin/posts')}
-            className="rounded-xl border border-slate-205 border-slate-200 bg-slate-100 px-6 py-2.5 text-xs font-semibold text-slate-800 hover:bg-slate-200 transition-all"
+            className="rounded-xl border border-slate-200 bg-slate-100 px-6 py-2.5 text-xs font-semibold text-slate-800 transition-all hover:bg-slate-200"
           >
             Hủy
           </button>
           <button
             type="submit"
+            disabled={isUploadingVideo}
             className="rounded-xl bg-primary px-6 py-2.5 text-xs font-semibold text-white hover:bg-emerald-500 transition-all shadow-sm"
           >
-            Lưu bài viết
+            {isUploadingVideo ? 'Đang upload video...' : 'Lưu bài viết'}
           </button>
         </div>
       </div>
